@@ -1,4 +1,9 @@
 #include <Arduino.h>
+#include <Wire.h>
+#include <avr/pgmspace.h>
+
+#include <SeeedGrayOLED.h>
+
 #include <ArduinoOTA.h>
 
 void setup(void) {
@@ -7,6 +12,18 @@ void setup(void) {
     Serial.println("Hello World");
 
     setupOTA();
+
+    Wire.begin();
+    SeeedGrayOled.init(SSD1327);      //initialize SEEED OLED display
+    SeeedGrayOled.clearDisplay();     //Clear Display.
+    SeeedGrayOled.setNormalDisplay(); //Set Normal Display Mode
+    SeeedGrayOled.setVerticalMode();  // Set to vertical mode for displaying text
+  
+    for(char i=0; i < 16 ; i++) {
+        SeeedGrayOled.setTextXY(i,0);  //set Cursor to ith line, 0th column
+        SeeedGrayOled.setGrayLevel(i); //Set Grayscale level. Any number between 0 - 15.
+        SeeedGrayOled.putString("Hello World OLED"); //Print Hello World
+    }
 }
 
 // *********************************************

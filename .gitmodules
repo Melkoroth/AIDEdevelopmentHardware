@@ -1,0 +1,3 @@
+[submodule "caregiverHardware/lib/OLED_Display_96X96"]
+	path = caregiverHardware/lib/OLED_Display_96X96
+	url = https://github.com/Seeed-Studio/OLED_Display_96X96.git
