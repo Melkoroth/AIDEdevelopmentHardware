@@ -10,3 +10,8 @@ git submodule update
 ```bash
 git clone git@github.com:Seeed-Studio/OLED_Display_96X96.git
 ```
+
+## Arduino Client for MQTT
+```bash
+git clone git@github.com:knolleary/pubsubclient.git
+```
