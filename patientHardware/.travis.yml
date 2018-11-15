@@ -29,17 +29,11 @@ cache:
     - "~/.platformio"
 
 env:
-  - PLATFORMIO_CI_SRC=caregiverHardware/src/aideHardwareCaregiver.ino
-  - PLATFORMIO_CI_SRC=patientHardware/src/aideHardwarePatient.ino
+  - PLATFORMIO_CI_SRC=src/aideHardwarePatient.ino
 
 install:
   - pip install -U platformio
   - platformio update
 
-  #External libraries
-  - wget https://github.com/Seeed-Studio/OLED_Display_96X96/archive/master.zip -O /tmp/OLED_Display_96X96.zip
-  - unzip /tmp/OLED_Display_96X96.zip -d /tmp
-
 script:
-  - platformio ci --lib="." --board=esp12e --lib="/tmp/OLED_Display_96X96-master"
-  # - platformio ci --lib="." --lib="/tmp/arduinoWebSockets-master" --lib="/tmp/hlw8012-master" --lib="/tmp/ArduinoJson-master" --board=esp12e --board=d1_mini_pro --board=esp01_1m
+  - platformio ci --lib="." --board=d1_mini_pro

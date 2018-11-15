@@ -25,3 +25,6 @@ mvn clean compile
 mvn exec:java -Dexec.mainClass=MqttPublishSample
 ```
 You should see message info in mosquitto's screen and in serial monitor.
+
+## ESP8266 Info
+A Wemos D1 Mini Pro is being used for testing.
