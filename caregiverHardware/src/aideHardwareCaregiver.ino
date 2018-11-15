@@ -5,30 +5,91 @@
 #include <SeeedGrayOLED.h>
 
 #include <ArduinoOTA.h>
+#include <ESP8266WiFi.h>
+#include <PubSubClient.h>
 
-void setup(void) {
-	Serial.begin(115200);
-    Serial.println();
-    Serial.println("Hello World");
+// *********************************************
+// PIN CONFIG AND OBJECT CREATION
+// *********************************************
+const uint8_t LEDPIN = 2;
+const uint8_t RXPIN = 3;
+const uint8_t TXPIN = 1;
+const uint8_t SDAPIN = 4;
+const uint8_t SCLPIN = 5;
 
-    setupOTA();
+const uint32_t CONNECTTIMEOUT = 30000;
+const char* ssid = "Ansible";
+const char* password = "1qaz2wsx";
+const char* mqttServer = "192.168.43.132";
+const uint16_t mqttPort = 1986;
+const char* mqttPubTopic = "pubESP";
+const char* mqttSubTopic = "subESP";
 
-    Wire.begin();
-    SeeedGrayOled.init(SSD1327);      //initialize SEEED OLED display
-    SeeedGrayOled.clearDisplay();     //Clear Display.
-    SeeedGrayOled.setNormalDisplay(); //Set Normal Display Mode
-    SeeedGrayOled.setVerticalMode();  // Set to vertical mode for displaying text
-  
-    for(char i=0; i < 16 ; i++) {
-        SeeedGrayOled.setTextXY(i,0);  //set Cursor to ith line, 0th column
-        SeeedGrayOled.setGrayLevel(i); //Set Grayscale level. Any number between 0 - 15.
-        SeeedGrayOled.putString("Hello World OLED"); //Print Hello World
-    }
-}
+WiFiClient wifiClient;
+PubSubClient mqttClient(wifiClient);
+
+//MQTT publish vars
+uint32_t lastMsgMillis = 0;
+char mqttMSG[50];
+uint32_t mqttCount = 0;
 
 // *********************************************
 // SETUP
 // *********************************************
+void setup(void) {
+    pinMode(LEDPIN, OUTPUT);
+
+    //Init Serial
+    Serial.begin(115200);
+    Serial.println();
+    Serial.println("Hello World!");
+
+    //Init LCD
+    Wire.begin();
+    SeeedGrayOled.init(SSD1327);   
+    SeeedGrayOled.clearDisplay();
+    SeeedGrayOled.setNormalDisplay();
+    SeeedGrayOled.setVerticalMode();
+    SeeedGrayOled.setTextXY(0, 0);
+    SeeedGrayOled.setGrayLevel(15);
+    SeeedGrayOled.putString("Hello World!");
+
+    connectWifi();
+    setupOTA();
+
+    //Init MQTT
+    mqttClient.setServer(mqttServer, mqttPort);
+    mqttClient.setCallback(mqttCallback);
+
+}
+
+void connectWifi() {
+    Serial.print("Connecting to: ");
+    Serial.print(ssid);
+    Serial.print(" | ");
+    Serial.println(password);
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(ssid, password);
+
+    uint32_t wifiConnectStartTime = millis();
+    while ((WiFi.status() != WL_CONNECTED) 
+            && ((millis() - wifiConnectStartTime) < CONNECTTIMEOUT)) {
+        delay(500);
+        digitalWrite(LEDPIN, LOW);
+        delay(50);
+        digitalWrite(LEDPIN, HIGH);
+        Serial.print(".");
+    }
+
+    if (WiFi.status() == WL_CONNECTED) {
+        Serial.println("");
+        Serial.print("Connected, IP: ");
+        Serial.println(WiFi.localIP());
+    } else {
+        Serial.println("Could not connect to wifi");
+    }
+}
+
 void setupOTA() {
     ArduinoOTA.onStart(otaOnStart);
     ArduinoOTA.onEnd(otaOnEnd);
@@ -43,7 +104,56 @@ void setupOTA() {
 // MAIN LOOP LOGIC
 // *********************************************
 void loop(void) {
+    ArduinoOTA.handle();
+    if (!mqttClient.connected()) {
+        mqttReconnect();
+    }
+    mqttClient.loop();
 
+    uint32_t millisNow = millis();
+    if (millisNow - lastMsgMillis > 5000) {
+        lastMsgMillis = millisNow;
+        mqttCount++;
+        snprintf(mqttMSG, 50, "Ping #%lu!", mqttCount);
+        mqttClient.publish(mqttPubTopic, mqttMSG);
+    }
+}
+
+// *********************************************
+// MQTT Functionality
+// *********************************************
+void mqttCallback(char* topic, byte* payload, unsigned int length) {
+    Serial.print("Message arrived [");
+    Serial.print(topic);
+    Serial.print("] ");
+    for (unsigned int i = 0; i < length; i++) {
+        Serial.print((char)payload[i]);
+    }
+    Serial.println();
+}
+
+void mqttReconnect() {
+  // Loop until we're reconnected
+  while (!mqttClient.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    // Create a random client ID
+    String clientId = "ESP8266Client-";
+    clientId += String(random(0xffff), HEX);
+    // Attempt to connect
+    if (mqttClient.connect(clientId.c_str())) {
+        Serial.println("connected");
+        // Once connected, publish an announcement...
+        mqttClient.publish(mqttPubTopic, "Hello world!");
+        // ... and resubscribe
+        mqttClient.subscribe(mqttSubTopic);
+    } else {
+        Serial.print("failed, rc=");
+        Serial.print(mqttClient.state());
+        Serial.println(" try again in 5 seconds");
+        // Wait 5 seconds before retrying
+        delay(5000);
+    }
+  }
 }
 
 // *********************************************
