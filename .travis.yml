@@ -1,8 +1,7 @@
 matrix:
   include:
   - language: python
-    python: 
-      - "2.7"
+    python: "2.7"
     sudo: false
     cache:
       directories: 
@@ -22,11 +21,10 @@ matrix:
       - unzip /tmp/pubsubclient.zip -d /tmp
 
     script:
-      - platformio ci --lib="." --board=d1_mini_pro -lib="/tmp/OLED_Display_96X96-master" --lib="/tmp/pubsubclient-master"
+      - platformio ci --board=d1_mini_pro --lib="." --lib="/tmp/OLED_Display_96X96-master" --lib="/tmp/pubsubclient-master"
 
   - language: java
-    jdk:
-      - openjdk8
+    jdk: "openjdk8"
     sudo: false
 
     before_install:
