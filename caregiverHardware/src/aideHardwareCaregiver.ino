@@ -28,9 +28,14 @@ const char* mqttSubTopic = "subESP";
 WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
 
+//LCD 96x96 -> 11 lines x 12 characters
+const uint8_t MAXLCDLINES = 11;
+const uint8_t MAXLCDCHARS = 12;
+
 //MQTT publish vars
+const uint8_t MAXMSGLEN = 50;
+char mqttMSG[MAXMSGLEN];
 uint32_t lastMsgMillis = 0;
-char mqttMSG[50];
 uint32_t mqttCount = 0;
 
 // *********************************************
@@ -47,11 +52,12 @@ void setup(void) {
     //Init LCD
     Wire.begin();
     SeeedGrayOled.init(SSD1327);   
-    SeeedGrayOled.clearDisplay();
     SeeedGrayOled.setNormalDisplay();
     SeeedGrayOled.setVerticalMode();
-    SeeedGrayOled.setTextXY(0, 0);
     SeeedGrayOled.setGrayLevel(15);
+    SeeedGrayOled.clearDisplay();
+
+    SeeedGrayOled.setTextXY(0, 0);
     SeeedGrayOled.putString("Hello World!");
 
     connectWifi();
@@ -60,7 +66,6 @@ void setup(void) {
     //Init MQTT
     mqttClient.setServer(mqttServer, mqttPort);
     mqttClient.setCallback(mqttCallback);
-
 }
 
 void connectWifi() {
@@ -114,7 +119,7 @@ void loop(void) {
     if (millisNow - lastMsgMillis > 5000) {
         lastMsgMillis = millisNow;
         mqttCount++;
-        snprintf(mqttMSG, 50, "Ping #%lu!", mqttCount);
+        snprintf(mqttMSG, MAXMSGLEN, "Ping #%lu!", mqttCount);
         mqttClient.publish(mqttPubTopic, mqttMSG);
     }
 }
@@ -126,10 +131,14 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
     Serial.print("Message arrived [");
     Serial.print(topic);
     Serial.print("] ");
+    char msg[MAXMSGLEN];
     for (unsigned int i = 0; i < length; i++) {
         Serial.print((char)payload[i]);
+        msg[i] = (char)payload[i];
     }
     Serial.println();
+
+    displayMQTTmessage(topic, msg);
 }
 
 void mqttReconnect() {
@@ -154,6 +163,79 @@ void mqttReconnect() {
         delay(5000);
     }
   }
+}
+
+// *********************************************
+// OLED FUNCTIONALITY
+// *********************************************
+//Displays topic and message data in OLED
+void displayMQTTmessage(char* topic, const char* msg) {
+    SeeedGrayOled.clearDisplay();
+    SeeedGrayOled.setTextXY(0, 0);
+    SeeedGrayOled.putString("Got data!");
+    SeeedGrayOled.setTextXY(2, 0);
+    SeeedGrayOled.putString("@ [");
+    SeeedGrayOled.putString(topic);
+    SeeedGrayOled.putString("]");
+    SeeedGrayOled.setTextXY(4, 0);
+    SeeedGrayOled.putString("Message:");
+
+    SeeedGrayOled.setTextXY(5, 0);
+    uint8_t msgLen = strlen(msg);
+    //Message fits one line
+    if (msgLen < MAXLCDCHARS) {
+        SeeedGrayOled.putString(msg);
+    //Message has to be split into lines
+    } else {
+        uint8_t numLines = msgLen / MAXLCDCHARS;
+        if (msgLen % MAXLCDCHARS > 0)
+            numLines++;
+        Serial.print("NumLines: ");
+        Serial.println(numLines);
+
+        for (int i = 0; i < numLines; i++) {
+            char msg0[MAXLCDCHARS + 1];
+            bzero(msg0, MAXLCDCHARS + 1);
+            strncpy(msg0, &msg[MAXLCDCHARS * i], MAXLCDCHARS);
+            Serial.print("Len msg0: ");
+            Serial.println(strlen(msg0));
+            Serial.println(msg0);
+            SeeedGrayOled.setTextXY(6 + i, 0);
+            SeeedGrayOled.putString(msg0);
+        }
+        /*
+        //Second
+        char msg1[MAXLCDCHARS + 1];
+        strncpy(msg1, &msg[MAXLCDCHARS + 1], MAXLCDCHARS);
+        msg1[MAXLCDCHARS + 1] = '\0';
+        Serial.print("Len msg1: ");
+        Serial.println(strlen(msg1));
+        Serial.println(msg1);
+        SeeedGrayOled.setTextXY(6, 0);
+        SeeedGrayOled.putString(msg1);
+        //More than three lines
+        if (numLines > 2) {
+            char msg2[MAXLCDCHARS + 1];
+            strncpy(msg2, &msg[MAXLCDCHARS * 2], MAXLCDCHARS);
+            msg2[MAXLCDCHARS + 1] = '\0';
+            Serial.print("Len msg2: ");
+            Serial.println(strlen(msg2));
+            Serial.println(msg2);
+            SeeedGrayOled.setTextXY(7, 0);
+            SeeedGrayOled.putString(msg2);
+        }
+        //More than four lines
+        if (numLines > 3) {
+            char msg3[MAXLCDCHARS + 1];
+            strncpy(msg3, &msg[MAXLCDCHARS * 3], MAXLCDCHARS);
+            msg3[MAXLCDCHARS + 1] = '\0';
+            Serial.print("Len msg3: ");
+            Serial.println(strlen(msg3));
+            Serial.println(msg3);
+            SeeedGrayOled.setTextXY(8, 0);
+            SeeedGrayOled.putString(msg3);
+        }*/
+    }
 }
 
 // *********************************************
