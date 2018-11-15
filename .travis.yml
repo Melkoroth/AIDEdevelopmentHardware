@@ -1,27 +1,6 @@
-# Continuous Integration (CI) is the practice, in software
-# engineering, of merging all developer working copies with a shared mainline
-# several times a day < http://docs.platformio.org/page/ci/index.html >
-#
-# Documentation:
-#
-# * Travis CI Embedded Builds with PlatformIO
-#   < https://docs.travis-ci.com/user/integration/platformio/ >
-#
-# * PlatformIO integration with Travis CI
-#   < http://docs.platformio.org/page/ci/travis.html >
-#
-# * User Guide for `platformio ci` command
-#   < http://docs.platformio.org/page/userguide/cmd_ci.html >
-#
-#
-# Please choice one of the following templates (proposed below) and uncomment
-# it (remove "# " before each line) or use own configuration according to the
-# Travis CI documentation (see above).
-#
 matrix:
   include:
-
-    - language: python
+  - language: python
     python: 
       - "2.7"
     sudo: false
@@ -45,10 +24,13 @@ matrix:
     script:
       - platformio ci --lib="." --board=d1_mini_pro -lib="/tmp/OLED_Display_96X96-master" --lib="/tmp/pubsubclient-master"
 
-    - language: java
+  - language: java
     jdk:
       - openjdk8
     sudo: false
+
+    before_install:
+      cd mqttJava
 
     install:
       - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
