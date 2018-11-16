@@ -135,11 +135,15 @@ void mqttCallback(char* topic, uint8_t* payload, unsigned int length) {
     Serial.print(length);
     Serial.print(" ");
     char msg[MAXMSGLEN + 1];
-    bzero(msg, MAXMSGLEN + 1);
+    //bzero(msg, sizeof(char) * (MAXMSGLEN + 1));
     for (uint8_t i = 0; i < length || i < MAXMSGLEN; i++) {
-        Serial.print((char)payload[i]);
+        //Serial.print((char)payload[i]);
         msg[i] = (char)payload[i];
     }
+    //Terminate char*
+    (length < MAXMSGLEN) ? msg[length] = '\0' : msg[MAXMSGLEN] = '\0';
+    Serial.print(strlen(msg));
+    Serial.print(" ");
     Serial.print(msg);
     Serial.println();
 
@@ -201,10 +205,12 @@ void displayMQTTmessage(const char* topic, const char* msg) {
 
         for (uint8_t i = 0; i < numLines; i++) {
             char msgO[MAXLCDCHARS + 1];
-            bzero(msgO, MAXLCDCHARS + 1);
+            //Fill with end character
+            memset(msgO, '\0', MAXLCDCHARS + 1);
             strncpy(msgO, &msg[MAXLCDCHARS * i], MAXLCDCHARS);
             SeeedGrayOled.setTextXY(6 + i, 0);
             SeeedGrayOled.putString(msgO);
+            delay(25);
         }
     }
 }

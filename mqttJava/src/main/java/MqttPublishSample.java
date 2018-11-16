@@ -3,6 +3,7 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+import java.nio.charset.StandardCharsets;
 
 public class MqttPublishSample {
 
@@ -23,7 +24,7 @@ public class MqttPublishSample {
             sampleClient.connect(connOpts);
             System.out.println("Connected");
             System.out.println("Publishing message: "+content);
-            MqttMessage message = new MqttMessage(content.getBytes());
+            MqttMessage message = new MqttMessage(content.getBytes(StandardCharsets.UTF_8));
             message.setQos(qos);
             sampleClient.publish(topic, message);
             System.out.println("Message published");
