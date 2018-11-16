@@ -61,7 +61,7 @@ void setup(void) {
     SeeedGrayOled.putString("Hello World!");
 
     connectWifi();
-    setupOTA();
+    //setupOTA();
 
     //Init MQTT
     mqttClient.setServer(mqttServer, mqttPort);
@@ -95,21 +95,21 @@ void connectWifi() {
     }
 }
 
-void setupOTA() {
-    ArduinoOTA.onStart(otaOnStart);
-    ArduinoOTA.onEnd(otaOnEnd);
-    ArduinoOTA.onProgress(otaOnProgress);
-    ArduinoOTA.onError(otaOnError);
-    ArduinoOTA.setPort(8266);
-    //ArduinoOTA.setHostname(HOSTNAME);
-    ArduinoOTA.begin();
-}
+// void setupOTA() {
+//     ArduinoOTA.onStart(otaOnStart);
+//     ArduinoOTA.onEnd(otaOnEnd);
+//     ArduinoOTA.onProgress(otaOnProgress);
+//     ArduinoOTA.onError(otaOnError);
+//     ArduinoOTA.setPort(8266);
+//     //ArduinoOTA.setHostname(HOSTNAME);
+//     ArduinoOTA.begin();
+// }
 
 // *********************************************
 // MAIN LOOP LOGIC
 // *********************************************
 void loop(void) {
-    ArduinoOTA.handle();
+    //ArduinoOTA.handle();
     if (!mqttClient.connected()) {
         mqttReconnect();
     }
@@ -127,20 +127,26 @@ void loop(void) {
 // *********************************************
 // MQTT Functionality
 // *********************************************
-void mqttCallback(char* topic, byte* payload, unsigned int length) {
+void mqttCallback(char* topic, uint8_t* payload, unsigned int length) {
     Serial.print("Message arrived [");
     Serial.print(topic);
     Serial.print("] ");
-    char msg[MAXMSGLEN];
-    for (unsigned int i = 0; i < length; i++) {
+    Serial.print("Length: ");
+    Serial.print(length);
+    Serial.print(" ");
+    char msg[MAXMSGLEN + 1];
+    bzero(msg, MAXMSGLEN + 1);
+    for (uint8_t i = 0; i < length || i < MAXMSGLEN; i++) {
         Serial.print((char)payload[i]);
         msg[i] = (char)payload[i];
     }
+    Serial.print(msg);
     Serial.println();
 
     displayMQTTmessage(topic, msg);
 }
 
+//Checks if MQTT is connected and reconnects if needed
 void mqttReconnect() {
   // Loop until we're reconnected
   while (!mqttClient.connected()) {
@@ -169,7 +175,7 @@ void mqttReconnect() {
 // OLED FUNCTIONALITY
 // *********************************************
 //Displays topic and message data in OLED
-void displayMQTTmessage(char* topic, const char* msg) {
+void displayMQTTmessage(const char* topic, const char* msg) {
     SeeedGrayOled.clearDisplay();
     SeeedGrayOled.setTextXY(0, 0);
     SeeedGrayOled.putString("Got data!");
@@ -193,87 +199,52 @@ void displayMQTTmessage(char* topic, const char* msg) {
         Serial.print("NumLines: ");
         Serial.println(numLines);
 
-        for (int i = 0; i < numLines; i++) {
-            char msg0[MAXLCDCHARS + 1];
-            bzero(msg0, MAXLCDCHARS + 1);
-            strncpy(msg0, &msg[MAXLCDCHARS * i], MAXLCDCHARS);
-            Serial.print("Len msg0: ");
-            Serial.println(strlen(msg0));
-            Serial.println(msg0);
+        for (uint8_t i = 0; i < numLines; i++) {
+            char msgO[MAXLCDCHARS + 1];
+            bzero(msgO, MAXLCDCHARS + 1);
+            strncpy(msgO, &msg[MAXLCDCHARS * i], MAXLCDCHARS);
             SeeedGrayOled.setTextXY(6 + i, 0);
-            SeeedGrayOled.putString(msg0);
+            SeeedGrayOled.putString(msgO);
         }
-        /*
-        //Second
-        char msg1[MAXLCDCHARS + 1];
-        strncpy(msg1, &msg[MAXLCDCHARS + 1], MAXLCDCHARS);
-        msg1[MAXLCDCHARS + 1] = '\0';
-        Serial.print("Len msg1: ");
-        Serial.println(strlen(msg1));
-        Serial.println(msg1);
-        SeeedGrayOled.setTextXY(6, 0);
-        SeeedGrayOled.putString(msg1);
-        //More than three lines
-        if (numLines > 2) {
-            char msg2[MAXLCDCHARS + 1];
-            strncpy(msg2, &msg[MAXLCDCHARS * 2], MAXLCDCHARS);
-            msg2[MAXLCDCHARS + 1] = '\0';
-            Serial.print("Len msg2: ");
-            Serial.println(strlen(msg2));
-            Serial.println(msg2);
-            SeeedGrayOled.setTextXY(7, 0);
-            SeeedGrayOled.putString(msg2);
-        }
-        //More than four lines
-        if (numLines > 3) {
-            char msg3[MAXLCDCHARS + 1];
-            strncpy(msg3, &msg[MAXLCDCHARS * 3], MAXLCDCHARS);
-            msg3[MAXLCDCHARS + 1] = '\0';
-            Serial.print("Len msg3: ");
-            Serial.println(strlen(msg3));
-            Serial.println(msg3);
-            SeeedGrayOled.setTextXY(8, 0);
-            SeeedGrayOled.putString(msg3);
-        }*/
     }
 }
 
 // *********************************************
 // OTA FUNCTIONALITY
 // *********************************************
-void otaOnStart() {
-    String type;
-    if (ArduinoOTA.getCommand() == U_FLASH)
-        type = "sketch";
-    else // U_SPIFFS
-        type = "filesystem";
-    // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
-    Serial.println("OTA Start Updating " + type);
-}
+// void otaOnStart() {
+//     String type;
+//     if (ArduinoOTA.getCommand() == U_FLASH)
+//         type = "sketch";
+//     else // U_SPIFFS
+//         type = "filesystem";
+//     // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
+//     Serial.println("OTA Start Updating " + type);
+// }
 
-void otaOnEnd() {
-    Serial.println("\nOTA End");
-}
+// void otaOnEnd() {
+//     Serial.println("\nOTA End");
+// }
 
-void otaOnProgress(unsigned int progress, unsigned int total) {
-    Serial.printf("OTA Progress: %u%%\r\n", (progress / (total / 100)));
-}
+// void otaOnProgress(unsigned int progress, unsigned int total) {
+//     Serial.printf("OTA Progress: %u%%\r\n", (progress / (total / 100)));
+// }
 
-void otaOnError(ota_error_t error) {
-    Serial.printf("OTA Error[%u]: ", error);
-    if (error == OTA_AUTH_ERROR) {
-        Serial.println("OTA Auth Failed");
-    }
-    else if (error == OTA_BEGIN_ERROR) {
-        Serial.println("OTA Begin Failed");
-    }
-    else if (error == OTA_CONNECT_ERROR) { 
-        Serial.println("OTA Connect Failed");
-    }
-    else if (error == OTA_RECEIVE_ERROR) {
-        Serial.println("OTA Receive Failed");
-    }
-    else if (error == OTA_END_ERROR) {
-        Serial.println("OTA End Failed");
-    }
-}
+// void otaOnError(ota_error_t error) {
+//     Serial.printf("OTA Error[%u]: ", error);
+//     if (error == OTA_AUTH_ERROR) {
+//         Serial.println("OTA Auth Failed");
+//     }
+//     else if (error == OTA_BEGIN_ERROR) {
+//         Serial.println("OTA Begin Failed");
+//     }
+//     else if (error == OTA_CONNECT_ERROR) { 
+//         Serial.println("OTA Connect Failed");
+//     }
+//     else if (error == OTA_RECEIVE_ERROR) {
+//         Serial.println("OTA Receive Failed");
+//     }
+//     else if (error == OTA_END_ERROR) {
+//         Serial.println("OTA End Failed");
+//     }
+// }

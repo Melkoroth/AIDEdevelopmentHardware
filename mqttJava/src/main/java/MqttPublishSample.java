@@ -9,7 +9,7 @@ public class MqttPublishSample {
     public static void main(String[] args) {
 
         String topic        = "subESP";
-        String content      = "01234567890123456789012345678901234567890124";
+        String content      = "JAVA Mqtt Publish Sample";
         int qos             = 2;
         String broker       = "tcp://localhost:1986";
         String clientId     = "JavaSampleClient";
