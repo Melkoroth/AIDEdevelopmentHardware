@@ -8,7 +8,7 @@ matrix:
         - "~/.platformio"
 
     env:
-      - PLATFORMIO_CI_SRC=caregiverHardware/src/aideHardwareCaregiver.ino
+      - PLATFORMIO_CI_SRC=espHardware/src/espHardware.ino
 
     install:
       - pip install -U platformio

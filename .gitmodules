@@ -1,6 +1,6 @@
-[submodule "caregiverHardware/lib/OLED_Display_96X96"]
-	path = caregiverHardware/lib/OLED_Display_96X96
+[submodule "espHardware/lib/OLED_Display_96X96"]
+	path = espHardware/lib/OLED_Display_96X96
 	url = https://github.com/Seeed-Studio/OLED_Display_96X96.git
-[submodule "caregiverHardware/lib/pubsubclient"]
-	path = caregiverHardware/lib/pubsubclient
+[submodule "espHardware/lib/pubsubclient"]
+	path = espHardware/lib/pubsubclient
 	url = https://github.com/knolleary/pubsubclient.git
