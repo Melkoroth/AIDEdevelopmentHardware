@@ -3,6 +3,7 @@
 #include <avr/pgmspace.h>
 
 #include <SeeedGrayOLED.h>
+#include <i2c_touch_sensor.h>
 
 #include <ArduinoOTA.h>
 #include <ESP8266WiFi.h>
@@ -21,6 +22,15 @@ const uint8_t SCLPIN = 5;
 #define Sprintln(x) (Serial.println(x))
 #define Sprint(x) (Serial.print(x))
 
+//LCD 96x96 -> 11 lines x 12 characters
+const uint8_t MAXLCDLINES = 11;
+const uint8_t MAXLCDCHARS = 12;
+
+//Touch sensor
+i2ctouchsensor touch;
+uint32_t lastTouchMillis = 0;
+
+//Wifi stuff
 const uint32_t CONNECTTIMEOUT = 30000;
 const char* ssid = "Ansible";
 const char* password = "1qaz2wsx";
@@ -28,19 +38,14 @@ const char* mqttServer = "192.168.43.132";
 const uint16_t mqttPort = 1986;
 const char* mqttPubTopic = "pubESP";
 const char* mqttSubTopic = "subESP";
-
 WiFiClient wifiClient;
-PubSubClient mqttClient(wifiClient);
 
-//LCD 96x96 -> 11 lines x 12 characters
-const uint8_t MAXLCDLINES = 11;
-const uint8_t MAXLCDCHARS = 12;
-
-//MQTT publish vars
+//MQTT vars
 const uint8_t MAXMSGLEN = 50;
 char mqttMSG[MAXMSGLEN];
 uint32_t lastMsgMillis = 0;
 uint32_t mqttCount = 0;
+PubSubClient mqttClient(wifiClient);
 
 // *********************************************
 // SETUP
@@ -52,6 +57,8 @@ void setup(void) {
     Serial.begin(115200);
     Sprintln();
     Sprintln("Hello World!");
+    //Init touch sensor
+    touch.initialize();
 
     //Init LCD
     Wire.begin();
@@ -136,6 +143,7 @@ void loop(void) {
     }
     mqttClient.loop();
 
+    //Outputs MQTT message
     uint32_t millisNow = millis();
     if (millisNow - lastMsgMillis > 5000) {
         lastMsgMillis = millisNow;
@@ -143,6 +151,20 @@ void loop(void) {
         snprintf(mqttMSG, MAXMSGLEN, "Ping #%lu!", mqttCount);
         mqttClient.publish(mqttPubTopic, mqttMSG);
     }
+
+    //Check button pressed
+    if (millisNow - lastTouchMillis > 500) {
+        lastTouchMillis = millisNow;
+        touch.getTouchState();
+    }
+    for (int i=0;i<12;i++) {
+        if (touch.touched&(1<<i)) {
+            Serial.print("pin ");
+            Serial.print(i);
+            Serial.println(" was  touched");
+        }
+    }
+
 }
 
 //Clears the LCD "by hand". Library method sometimes crashes

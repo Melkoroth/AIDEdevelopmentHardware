@@ -4,3 +4,6 @@
 [submodule "espHardware/lib/pubsubclient"]
 	path = espHardware/lib/pubsubclient
 	url = https://github.com/knolleary/pubsubclient.git
+[submodule "espHardware/lib/Grove_I2C_Touch_Sensor"]
+	path = espHardware/lib/Grove_I2C_Touch_Sensor
+	url = https://github.com/Melkoroth/Grove_I2C_Touch_Sensor.git

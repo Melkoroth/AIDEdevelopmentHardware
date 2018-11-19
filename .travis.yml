@@ -19,9 +19,11 @@ matrix:
       - unzip /tmp/OLED_Display_96X96.zip -d /tmp
       - wget https://github.com/knolleary/pubsubclient/archive/master.zip -O /tmp/pubsubclient.zip
       - unzip /tmp/pubsubclient.zip -d /tmp
+      - wget https://github.com/Melkoroth/Grove_I2C_Touch_Sensor/archive/master.zip -O /tmp/Grove_I2C_Touch_Sensor.zip
+      - unzip /tmp/Grove_I2C_Touch_Sensor.zip -d /tmp
 
     script:
-      - platformio ci --board=d1_mini_pro --lib="." --lib="/tmp/OLED_Display_96X96-master" --lib="/tmp/pubsubclient-master"
+      - platformio ci --board=d1_mini_pro --lib="." --lib="/tmp/OLED_Display_96X96-master" --lib="/tmp/pubsubclient-master" --lib="/tmp/Grove_I2C_Touch_Sensor-master"
 
   - language: java
     jdk: "openjdk8"
