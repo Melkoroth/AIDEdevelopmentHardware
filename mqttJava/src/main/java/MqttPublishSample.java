@@ -5,18 +5,18 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import java.nio.charset.StandardCharsets;
 
-import phat.app.PHATApplication;
-import phat.app.PHATInitAppListener;
-import phat.body.BodiesAppState;
-import phat.body.commands.RandomWalkingCommand;
-import phat.body.commands.SetBodyInCoordenatesCommand;
-import phat.body.commands.SetSpeedDisplacemenetCommand;
-import phat.commands.PHATCommand;
-import phat.commands.PHATCommandListener;
-import phat.devices.DevicesAppState;
-import phat.devices.commands.CreatePresenceSensorCommand;
-import phat.util.SpatialFactory;
-import phat.world.WorldAppState;
+// import phat.app.PHATApplication;
+// import phat.app.PHATInitAppListener;
+// import phat.body.BodiesAppState;
+// import phat.body.commands.RandomWalkingCommand;
+// import phat.body.commands.SetBodyInCoordenatesCommand;
+// import phat.body.commands.SetSpeedDisplacemenetCommand;
+// import phat.commands.PHATCommand;
+// import phat.commands.PHATCommandListener;
+// import phat.devices.DevicesAppState;
+// import phat.devices.commands.CreatePresenceSensorCommand;
+// import phat.util.SpatialFactory;
+// import phat.world.WorldAppState;
 
 public class MqttPublishSample {
 

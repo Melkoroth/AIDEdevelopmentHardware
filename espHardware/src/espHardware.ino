@@ -59,10 +59,11 @@ void setup(void) {
     SeeedGrayOled.setNormalDisplay();
     SeeedGrayOled.setVerticalMode();
     SeeedGrayOled.setGrayLevel(15);
-    SeeedGrayOled.clearDisplay();
-
+    clearLCD();
     SeeedGrayOled.setTextXY(0, 0);
     SeeedGrayOled.putString("Hello World!");
+    delay(500);
+    clearLCD();
 
     connectWifi();
     //setupOTA();
@@ -73,6 +74,7 @@ void setup(void) {
 }
 
 void connectWifi() {
+    clearLCD();
     Sprint("Connecting to: ");
     Sprint(ssid);
     Sprint(" | ");
@@ -98,8 +100,9 @@ void connectWifi() {
         Sprint(".");
     }
 
+    
+    clearLCD(0);
     SeeedGrayOled.setTextXY(0, 0);
-    SeeedGrayOled.clearDisplay();
     if (WiFi.status() == WL_CONNECTED) {
         Sprintln("");
         Sprint("Connected, IP: ");
@@ -142,10 +145,21 @@ void loop(void) {
     }
 }
 
+//Clears the LCD "by hand". Library method sometimes crashes
+//Can be called without parameters to clear all or with a specific line
 void clearLCD() {
-    for (uint8_t i = 0; i < MAXLCDLINES; i++) {
-        SeeedGrayOled.setTextXY(i, 0);
-        SeeedGrayOled.clearDisplay();
+    clearLCD(255);
+}
+void clearLCD(uint8_t line) {
+    if (line == 255) {
+        for (uint8_t i = 0; i < MAXLCDLINES; i++) {
+            SeeedGrayOled.setTextXY(i, 0);
+            SeeedGrayOled.putString("            ");
+            delay(1);
+        }
+    } else {
+        SeeedGrayOled.setTextXY(line, 0);
+        SeeedGrayOled.putString("            ");
     }
 }
 
@@ -156,9 +170,6 @@ void mqttCallback(char* topic, uint8_t* payload, unsigned int length) {
     Sprint("Message arrived [");
     Sprint(topic);
     Sprint("] ");
-    Sprint("Length: ");
-    Sprint(length);
-    Sprint(" ");
     char msg[MAXMSGLEN + 1];
     //bzero(msg, sizeof(char) * (MAXMSGLEN + 1));
     for (uint8_t i = 0; i < length || i < MAXMSGLEN; i++) {
@@ -167,6 +178,7 @@ void mqttCallback(char* topic, uint8_t* payload, unsigned int length) {
     }
     //Terminate char*
     (length < MAXMSGLEN) ? msg[length] = '\0' : msg[MAXMSGLEN] = '\0';
+    Sprint("Length: ");
     Sprint(strlen(msg));
     Sprint(" ");
     Sprint(msg);
@@ -225,21 +237,19 @@ void displayMQTTmessage(const char* topic, const char* msg) {
         uint8_t numLines = msgLen / MAXLCDCHARS;
         if (msgLen % MAXLCDCHARS > 0)
             numLines++;
-        Sprint("NumLines: ");
-        Sprintln(numLines);
 
         //Delays are added to prevent WDT from triggering
         for (uint8_t i = 0; i < numLines; i++) {
             char msgO[MAXLCDCHARS + 1];
             //Fill with end character
             memset(msgO, '\0', MAXLCDCHARS + 1);
-            delay(25);
+            delay(5);
             strncpy(msgO, &msg[MAXLCDCHARS * i], MAXLCDCHARS);
-            delay(25);
+            delay(5);
             SeeedGrayOled.setTextXY(6 + i, 0);
-            delay(25);
+            delay(5);
             SeeedGrayOled.putString(msgO);
-            delay(25);
+            delay(5);
         }
     }
 }
