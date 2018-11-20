@@ -1,13 +1,19 @@
 # AIDEdevelopmentHardware
+[![Build Status](https://travis-ci.com/Melkoroth/AIDEdevelopmentHardware.svg?token=jLXVWnBdCix3QQKg7rsP&branch=master)](https://travis-ci.com/Melkoroth/AIDEdevelopmentHardware)
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-## JAVA MQTT Test
-At the moment the topics used are:
-* ESP publishes to *pubESP*
-* ESP subscribes to *subESP*
-* JAVA publishes to *subESP*
+This project stems from [AIDE for People with Neurodegenerative Diseases](http://grasiagroup.fdi.ucm.es/aidendd/) and tries to solve some problems the patients have by the use of custom-made hardware.
 
-### Running broker
-Install mosquitto and in a terminal run:
+As it is a derived project which uses [PHATSIM](https://github.com/Grasia/phatsim) we can test the developed hardware in the simulator before implementing it in real-life. For communication between the simulation framework and real hardware MQTT was chosen.
+
+## Using the MQTT broker
+MQTT needs a server installed to be used as a MQTT broker. You can use Ubuntu's included one, mosquitto, or an external provider just by changing IP address and port inside the code.
+
+### Installation and usage
+```bash
+sudo apt update && sudo apt install mosquitto mosquitto-clients
+```
+To start broker run:
 ```bash
 mosquitto -p 1986 -v
 ```
@@ -16,17 +22,34 @@ You can also use mosquitto_sub to watch a specific topic:
 ```bash
 mosquitto_sub -h localhost -p 1986 -t topicName
 ```
-### How it works
-By default ESP publishes every 5 seconds to *pubESP* and any message sent to *subESP* is written to serial.
+### Generating messages
+You can use mosquitto_pub to send a message to any topic:
+```bash
+mosquitto_pub -h localhost -t "anyTopic" -m "message"
+```
+## Topics used
+* ESP publishes to *pubESP*
+* ESP subscribes to *subESP*
+* JAVA publishes to *subESP*
+
+## MqttPublishSample
+[![OpenJDK Version](https://img.shields.io/badge/openjdk-v1.8-red.svg)](http://openjdk.java.net/)
+[![Maven Version](https://img.shields.io/badge/maven-v3.1.1-orange.svg)](http://maven.apache.org/)
+
+If you need help installing the necesary JAVA stuff, please refer to [PHATSIM's Readme](https://github.com/Grasia/phatsim) 
 
 To send a message from JAVA:
 ```bash
+cd mqttJava
 mvn clean compile
 mvn exec:java -Dexec.mainClass=MqttPublishSample
 ```
 You should see message info in mosquitto's screen and in serial monitor.
 
-## ESP8266 Info
+## espHardware sketch
+By default ESP publishes every 5 seconds to *pubESP* and any message sent to *subESP* is written to serial.
+
+## Why ESP8266?
 A Wemos D1 Mini Pro is being used for the rapid prototyping of AAL solutions. The board is based in the ESP8266 chip with 16MB of on-board flash memory.
 
 Some of its advantaged over other platforms include:

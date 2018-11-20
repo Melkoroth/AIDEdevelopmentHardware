@@ -128,7 +128,7 @@ void connectWifi() {
         // SeeedGrayOled.putString(char*(WiFi.localIP()));
     } else {
         Sprintln("Could not connect to wifi");
-        SeeedGrayOled.putString("Could not connect!");
+        SeeedGrayOled.putString("Wifi failed");
     }
 }
 
@@ -224,6 +224,8 @@ void mqttReconnect() {
     // Attempt to connect
     if (mqttClient.connect(clientId.c_str())) {
         Sprintln("connected");
+        clearLCD(4);
+        clearLCD(5);
         SeeedGrayOled.setTextXY(4, 0);
         SeeedGrayOled.putString("MQTT On");
         // Once connected, publish an announcement...
@@ -233,7 +235,9 @@ void mqttReconnect() {
     } else {
         Sprint("failed, rc=");
         SeeedGrayOled.setTextXY(4, 0);
-        SeeedGrayOled.putString("MQTT Fail... retry");
+        SeeedGrayOled.putString("MQTT Fail...");
+        SeeedGrayOled.setTextXY(5, 0);
+        SeeedGrayOled.putString("retry in 5s");
         Sprint(mqttClient.state());
         Sprintln(" try again in 5 seconds");
         // Wait 5 seconds before retrying
