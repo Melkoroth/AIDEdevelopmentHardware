@@ -3,7 +3,7 @@
 #include <avr/pgmspace.h>
 
 #include <SeeedGrayOLED.h>
-#include <i2c_touch_sensor.h>
+#include <Adafruit_MPR121.h>
 
 #include <ArduinoOTA.h>
 #include <ESP8266WiFi.h>
@@ -18,6 +18,10 @@ const uint8_t TXPIN = 1;
 const uint8_t SDAPIN = 4;
 const uint8_t SCLPIN = 5;
 
+//I2C Addresses
+uint8_t OLEDADDRESS = 0x3C;
+uint8_t TOUCHADDRESS = 0x5A;
+
 //Control if HW outputs to serial or not
 #define Sprintln(x) (Serial.println(x))
 #define Sprint(x) (Serial.print(x))
@@ -27,15 +31,19 @@ const uint8_t MAXLCDLINES = 11;
 const uint8_t MAXLCDCHARS = 12;
 
 //Touch sensor
-i2ctouchsensor touch;
+Adafruit_MPR121 touch;
 uint32_t lastTouchMillis = 0;
+// Keeps track of the last pins touched
+// so we know when buttons are 'released'
+uint16_t lastTouched = 0;
+uint16_t currtouched = 0;
 
 //Wifi stuff
 const uint32_t CONNECTTIMEOUT = 30000;
 const char* ssid = "Ansible";
 const char* password = "1qaz2wsx";
 const char* mqttServer = "192.168.43.132";
-const uint16_t mqttPort = 1986;
+const uint16_t mqttPort = 1982;
 const char* mqttPubTopic = "pubESP";
 const char* mqttSubTopic = "subESP";
 WiFiClient wifiClient;
@@ -58,10 +66,11 @@ void setup(void) {
     Sprintln();
     Sprintln("Hello World!");
     //Init touch sensor
-    touch.initialize();
+    touch.begin(TOUCHADDRESS);
 
     //Init LCD
     Wire.begin();
+    //listI2Cdevices();
     SeeedGrayOled.init(SSD1327);   
     SeeedGrayOled.setNormalDisplay();
     SeeedGrayOled.setVerticalMode();
@@ -137,52 +146,47 @@ void setupOTA() {
 // MAIN LOOP LOGIC
 // *********************************************
 void loop(void) {
-    //ArduinoOTA.handle();
+    ArduinoOTA.handle();
     if (!mqttClient.connected()) {
         mqttReconnect();
     }
     mqttClient.loop();
 
-    //Outputs MQTT message
     uint32_t millisNow = millis();
+    sendMQTT(millisNow);
+    checkButtons(millisNow);
+}
+
+//Outputs MQTT message
+void sendMQTT(uint32_t millisNow) {
     if (millisNow - lastMsgMillis > 5000) {
         lastMsgMillis = millisNow;
         mqttCount++;
         snprintf(mqttMSG, MAXMSGLEN, "Ping #%lu!", mqttCount);
         mqttClient.publish(mqttPubTopic, mqttMSG);
-    }
+    } 
+}
 
-    //Check button pressed
-    if (millisNow - lastTouchMillis > 500) {
+//Check button presses
+void checkButtons(uint32_t millisNow) {
+    if (millisNow - lastTouchMillis > 100) {
         lastTouchMillis = millisNow;
-        touch.getTouchState();
-    }
-    for (int i=0;i<12;i++) {
-        if (touch.touched&(1<<i)) {
-            Serial.print("pin ");
-            Serial.print(i);
-            Serial.println(" was  touched");
-        }
-    }
+        // Get the currently touched pads
+        currtouched = touch.touched();
 
-}
-
-//Clears the LCD "by hand". Library method sometimes crashes
-//Can be called without parameters to clear all or with a specific line
-void clearLCD() {
-    clearLCD(255);
-}
-void clearLCD(uint8_t line) {
-    if (line == 255) {
-        for (uint8_t i = 0; i < MAXLCDLINES; i++) {
-            SeeedGrayOled.setTextXY(i, 0);
-            SeeedGrayOled.putString("            ");
-            delay(1);
+        for (uint8_t i=0; i<12; i++) {
+            // it if *is* touched and *wasnt* touched before, alert!
+            if ((currtouched & _BV(i)) && !(lastTouched & _BV(i)) ) {
+                Serial.print(i); Serial.println(" touched");
+            }
+            // if it *was* touched and now *isnt*, alert!
+            if (!(currtouched & _BV(i)) && (lastTouched & _BV(i)) ) {
+                Serial.print(i); Serial.println(" released");
+            }
         }
-    } else {
-        SeeedGrayOled.setTextXY(line, 0);
-        SeeedGrayOled.putString("            ");
-    }
+        // reset our state
+        lastTouched = currtouched;
+    } 
 }
 
 // *********************************************
@@ -220,12 +224,16 @@ void mqttReconnect() {
     // Attempt to connect
     if (mqttClient.connect(clientId.c_str())) {
         Sprintln("connected");
+        SeeedGrayOled.setTextXY(4, 0);
+        SeeedGrayOled.putString("MQTT On");
         // Once connected, publish an announcement...
         mqttClient.publish(mqttPubTopic, "Hello world!");
         // ... and resubscribe
         mqttClient.subscribe(mqttSubTopic);
     } else {
         Sprint("failed, rc=");
+        SeeedGrayOled.setTextXY(4, 0);
+        SeeedGrayOled.putString("MQTT Fail... retry");
         Sprint(mqttClient.state());
         Sprintln(" try again in 5 seconds");
         // Wait 5 seconds before retrying
@@ -237,6 +245,24 @@ void mqttReconnect() {
 // *********************************************
 // OLED FUNCTIONALITY
 // *********************************************
+//Clears the LCD "by hand". Library method sometimes crashes
+//Can be called without parameters to clear all or with a specific line
+void clearLCD() {
+    clearLCD(255);
+}
+void clearLCD(uint8_t line) {
+    if (line == 255) {
+        for (uint8_t i = 0; i <= MAXLCDLINES; i++) {
+            SeeedGrayOled.setTextXY(i, 0);
+            SeeedGrayOled.putString("            ");
+            delay(1);
+        }
+    } else {
+        SeeedGrayOled.setTextXY(line, 0);
+        SeeedGrayOled.putString("            ");
+    }
+}
+
 //Displays topic and message data in OLED
 void displayMQTTmessage(const char* topic, const char* msg) {
     clearLCD();
@@ -314,4 +340,41 @@ void otaOnError(ota_error_t error) {
     else if (error == OTA_END_ERROR) {
         Sprintln("OTA End Failed");
     }
+}
+
+// *********************************************
+// AUX FUNCTIONS
+// *********************************************
+void listI2Cdevices() {
+  byte error, address;
+  int nDevices;
+  nDevices = 0;
+  Sprintln("Scanning for I2C devices...");
+  for (address = 1; address < 127; address++ )  {
+    // The i2c_scanner uses the return value of
+    // the Write.endTransmisstion to see if
+    // a device did acknowledge to the address.
+    Wire.beginTransmission(address);
+    error = Wire.endTransmission();
+
+    if (error == 0){
+      Serial.print("I2C device found at address 0x");
+      if (address < 16)
+        Serial.print("0");
+      Serial.print(address, HEX);
+      Serial.println("  !");
+
+      nDevices++;
+    } else if (error == 4) {
+      Serial.print("Unknow error at address 0x");
+      if (address < 16)
+        Serial.print("0");
+      Serial.println(address, HEX);
+    }
+  } //for loop
+  if (nDevices == 0)
+    Serial.println("No I2C devices found");
+  else
+    Serial.println("**********************************\n");
+  //delay(1000);           // wait 1 seconds for next scan, did not find it necessary
 }

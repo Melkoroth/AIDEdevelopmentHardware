@@ -25,7 +25,7 @@ public class MqttPublishSample {
         String topic        = "subESP";
         String content      = "JAVA Mqtt Publish Sample";
         int qos             = 2;
-        String broker       = "tcp://localhost:1986";
+        String broker       = "tcp://localhost:1982";
         String clientId     = "JavaSampleClient";
         MemoryPersistence persistence = new MemoryPersistence();
 
