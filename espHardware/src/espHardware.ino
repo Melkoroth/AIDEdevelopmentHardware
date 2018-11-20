@@ -12,7 +12,11 @@
 // *********************************************
 // PIN CONFIG AND OBJECT CREATION
 // *********************************************
-const uint8_t LEDPIN = 2;
+//For pin definitions see: https://github.com/esp8266/Arduino/blob/master/variants/nodemcu/pins_arduino.h
+//PCB LED pins are recycled for external LED
+const uint8_t PCBLEDPIN = 2;
+const uint8_t LEDGNDPIN = 2; 
+const uint8_t LEDVCCPIN = 0;
 const uint8_t RXPIN = 3;
 const uint8_t TXPIN = 1;
 const uint8_t SDAPIN = 4;
@@ -23,6 +27,7 @@ uint8_t OLEDADDRESS = 0x3C;
 uint8_t TOUCHADDRESS = 0x5A;
 
 //Control if HW outputs to serial or not
+//Declare as empty to disable output
 #define Sprintln(x) (Serial.println(x))
 #define Sprint(x) (Serial.print(x))
 
@@ -59,18 +64,27 @@ PubSubClient mqttClient(wifiClient);
 // SETUP
 // *********************************************
 void setup(void) {
-    pinMode(LEDPIN, OUTPUT);
+    //Init pins
+    pinMode(PCBLEDPIN, OUTPUT);
+    pinMode(LEDGNDPIN, OUTPUT);
+    pinMode(LEDVCCPIN, OUTPUT);
+    digitalWrite(LEDGNDPIN, false);
+    digitalWrite(LEDVCCPIN, false);
+    setWarningLed(true);
 
     //Init Serial
     Serial.begin(115200);
     Sprintln();
     Sprintln("Hello World!");
+
+    //Init I2C
+    Wire.begin();
+    //listI2Cdevices();
+
     //Init touch sensor
     touch.begin(TOUCHADDRESS);
 
     //Init LCD
-    Wire.begin();
-    //listI2Cdevices();
     SeeedGrayOled.init(SSD1327);   
     SeeedGrayOled.setNormalDisplay();
     SeeedGrayOled.setVerticalMode();
@@ -82,13 +96,19 @@ void setup(void) {
     clearLCD();
 
     connectWifi();
-    //setupOTA();
+    setupOTA();
 
     //Init MQTT
     mqttClient.setServer(mqttServer, mqttPort);
     mqttClient.setCallback(mqttCallback);
+
+    //Init random seed
+    randomSeed(micros());
+
+    setWarningLed(false);
 }
 
+//Connects to Wifi
 void connectWifi() {
     clearLCD();
     Sprint("Connecting to: ");
@@ -110,9 +130,9 @@ void connectWifi() {
     while ((WiFi.status() != WL_CONNECTED) 
             && ((millis() - wifiConnectStartTime) < CONNECTTIMEOUT)) {
         delay(500);
-        digitalWrite(LEDPIN, LOW);
+        digitalWrite(PCBLEDPIN, LOW);
         delay(50);
-        digitalWrite(LEDPIN, HIGH);
+        digitalWrite(PCBLEDPIN, HIGH);
         Sprint(".");
     }
 
@@ -177,16 +197,29 @@ void checkButtons(uint32_t millisNow) {
         for (uint8_t i=0; i<12; i++) {
             // it if *is* touched and *wasnt* touched before, alert!
             if ((currtouched & _BV(i)) && !(lastTouched & _BV(i)) ) {
-                Serial.print(i); Serial.println(" touched");
+                Sprint(i); Sprintln(" touched");
             }
             // if it *was* touched and now *isnt*, alert!
             if (!(currtouched & _BV(i)) && (lastTouched & _BV(i)) ) {
-                Serial.print(i); Serial.println(" released");
+                Sprint(i); Sprintln(" released");
             }
         }
         // reset our state
         lastTouched = currtouched;
     } 
+}
+
+//Handles red LED
+//We use PWM at low duty cycle in order not to burn it
+//as we aren't using a resistor as we should :P
+//The LED will probably burn-out and it could cause the pin to break too
+//In the long-run THIS IS PRETTY BAD -> Solder resistor
+void setWarningLed(boolean state) {
+    if (state) {
+        analogWrite(LEDVCCPIN, 127);
+    } else {
+        analogWrite(LEDVCCPIN, 0);       
+    }
 }
 
 // *********************************************
