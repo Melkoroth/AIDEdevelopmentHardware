@@ -1,5 +1,6 @@
 # AIDEdevelopmentHardware
 [![Build Status](https://travis-ci.com/Melkoroth/AIDEdevelopmentHardware.svg?token=jLXVWnBdCix3QQKg7rsP&branch=master)](https://travis-ci.com/Melkoroth/AIDEdevelopmentHardware)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f610aeff73444cc1a1192f05cad7a57e)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Melkoroth/AIDEdevelopmentHardware&amp;utm_campaign=Badge_Grade)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 This project stems from [AIDE for People with Neurodegenerative Diseases](http://grasiagroup.fdi.ucm.es/aidendd/) and tries to solve some problems the patients have by the use of custom-made hardware.

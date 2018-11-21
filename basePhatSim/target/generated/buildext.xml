@@ -1,0 +1,96 @@
+
+<project>
+    
+<target name="runSimNoSymptoms" depends="compile">
+        <condition property="arg.ml" value="-ml">
+            <isset property="ml"/>
+        </condition>
+        <condition property="arg.fps" value="-fps">
+            <isset property="fps"/>
+        </condition>
+        <condition property="arg.sv" value="-sv">
+            <isset property="sv"/>
+        </condition>
+        <condition property="arg.record" value="-record">
+            <isset property="record"/>
+        </condition>
+        <echoproperties regex="arg.fps"/>
+        <echoproperties regex="arg.ml"/>
+        <echoproperties regex="arg.sv"/>
+        <echoproperties regex="arg.record"/>
+        <java fork="true" failonerror="true" maxmemory="300m"
+              classname="phat.sim.MainSimNoSymptomsPHATSimulation">
+            <arg value="${arg.ml}"/>
+            <arg value="${arg.fps}"/>
+            <arg value="${arg.sv}"/>
+            <arg value="${arg.record}"/>
+            <classpath>			  
+                <pathelement path="${maven.build.outputDir}" />
+                <pathelement path="${mavenclasspath}" />              
+            </classpath>
+        </java>
+    </target>
+    <target name="runSimNoSymptomsNoDevices" depends="compile">
+        <condition property="arg.ml" value="-ml">
+            <isset property="ml"/>
+        </condition>
+        <condition property="arg.fps" value="-fps">
+            <isset property="fps"/>
+        </condition>
+        <condition property="arg.sv" value="-sv">
+            <isset property="sv"/>
+        </condition>
+        <echoproperties regex="arg.fps"/>
+        <echoproperties regex="arg.ml"/>
+        <echoproperties regex="arg.sv"/>
+        <java fork="true" failonerror="true" maxmemory="300m"
+              classname="phat.sim.MainSimNoSymptomsPHATSimulationNoDevices">
+            <arg value="${arg.ml}"/>
+            <arg value="${arg.fps}"/>
+            <arg value="${arg.sv}"/>
+            <classpath>			  
+                <pathelement path="${maven.build.outputDir}" />
+                <pathelement path="${mavenclasspath}" />              
+            </classpath>
+        </java>
+    </target>
+    <target name="runSimNoSymptomsNoDevicesRecord" depends="compile">
+        <condition property="arg.ml" value="-ml">
+            <isset property="ml"/>
+        </condition>
+        <condition property="arg.fps" value="-fps">
+            <isset property="fps"/>
+        </condition>
+        <condition property="arg.sv" value="-sv">
+            <isset property="sv"/>
+        </condition>
+        <echoproperties regex="arg.fps"/>
+        <echoproperties regex="arg.ml"/>
+        <echoproperties regex="arg.sv"/>
+        <java fork="true" failonerror="true" maxmemory="300m"
+              classname="phat.sim.MainSimNoSymptomsPHATSimulationNoDevicesRecord">
+            <arg value="${arg.ml}"/>
+            <arg value="${arg.fps}"/>
+            <arg value="${arg.sv}"/>
+            <classpath>			  
+                <pathelement path="${maven.build.outputDir}" />
+                <pathelement path="${mavenclasspath}" />              
+            </classpath>
+        </java>
+    </target>
+
+    <target name="runSimNoSymptomsOnlyDevices" depends="compile">
+        <java fork="true" failonerror="true" maxmemory="300m"
+              classname="phat.sim.MainSimNoSymptomsPHATSimulationOnlyDevices">
+            <classpath>			  
+                <pathelement path="${maven.build.outputDir}" />
+                <pathelement path="${mavenclasspath}" />              
+            </classpath>
+        </java>
+    </target>
+    <target name="packageSimNoSymptoms" depends="compile">
+        <maven basedir="${pom.dir}" goal="package" resultproperty="maven.build.result" options="-e -Dbuild.for.prod=false -Djavac.debug=true -Djavac.optimize=false -Dshade.mainName=SimNoSymptoms -Dshade.mainClass=phat.sim.MainSimNoSymptomsPHATSimulation"/>
+    </target>
+
+    
+</project>

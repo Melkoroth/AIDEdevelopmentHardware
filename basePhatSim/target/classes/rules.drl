@@ -1,0 +1,28 @@
+
+
+package sociaal;
+
+dialect "mvel"
+
+import jade.lang.acl.ACLMessage;
+import jade.domain.introspection.Event;
+import phat.agents.AgentPHATEvent;
+import phat.body.BodyUtils.BodyPosture;
+import phat.world.MonitorEventQueue;
+import phat.world.MonitorEventQueueImp;
+import phat.world.PHATCalendar;
+import sociaal.*;
+import sociaal.ontology.*;
+import sociaal.*;
+import sociaal.norms.*;
+
+
+/*******************************************************/
+// Norm violation detection
+/*******************************************************/
+
+
+
+
+
+
