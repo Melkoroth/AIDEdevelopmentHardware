@@ -48,7 +48,7 @@ const uint32_t CONNECTTIMEOUT = 30000;
 const char* ssid = "Ansible";
 const char* password = "1qaz2wsx";
 const char* mqttServer = "192.168.43.132";
-const uint16_t mqttPort = 1982;
+const uint16_t mqttPort = 1986;
 const char* mqttPubTopic = "pubESP";
 const char* mqttSubTopic = "subESP";
 WiFiClient wifiClient;

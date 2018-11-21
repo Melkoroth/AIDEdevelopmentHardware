@@ -8,11 +8,11 @@
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>aide.hardware</groupId>
-  <artifactId>mqttTest</artifactId>
+  <artifactId>phatLink</artifactId>
   <packaging>jar</packaging>
   <version>1.0.0-SNAPSHOT</version>
-  <name>AIDE MQTT Test</name>
-  <description>MQTT Test for AIDE Hardware project</description>
+  <name>AIDE Hardware PHAT Link</name>
+  <description>Serves as a MQTT link between PHAT and hardware</description>
   <url>https://github.com/Melkoroth/AIDEdevelopmentHardware</url>
 
   <licenses>
@@ -35,9 +35,19 @@
 
   <developers>
     <developer>
+      <id>escalope</id>
+      <name>Jorge Gomez-Sanz</name>
+      <email>jjgomez@fdi.ucm.es</email>
+    </developer>
+    <developer>
       <id>Melkoroth</id>
       <name>Juan L. Perez</name>
       <email>jlpdiez@ucm.es</email>
+    </developer>
+    <developer>
+      <id>pcampillo</id>
+      <name>Pablo Campillo-Sanchez</name>
+      <email>pabcampi@ucm.es</email>
     </developer>
   </developers>
 
@@ -45,14 +55,64 @@
     <vendor>GRASIA Research Group</vendor>
     <developername>Juan Luis Perez Diez</developername>
     <developeremail>jlpdiez@ucm.es</developeremail>
+    <jme.version>3.0.1</jme.version>
+    <sociaal.version>1.0.12-SNAPSHOT</sociaal.version>
+    <jali.version>1.0.10-SNAPSHOT</jali.version>
+    <jdos.version>1.0.9-SNAPSHOT</jdos.version>
+    <phat.version>1.0.12-SNAPSHOT</phat.version>
   </properties>
 
   <dependencies>
     <dependency>
+      <groupId>net.sf.phat</groupId>
+      <artifactId>phat-device-server</artifactId>
+      <version>${phat.version}</version>
+    </dependency>
+    <dependency> 
       <groupId>org.eclipse.paho</groupId>
       <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
       <version>1.2.0</version>
     </dependency>
+    <!-- <dependency>
+      <groupId>net.sf.jali</groupId>
+      <artifactId>jali-adm</artifactId>
+      <version>${jali.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.jali</groupId>
+      <artifactId>jali-phat-client</artifactId>
+      <version>${jali.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.jdos</groupId>
+      <artifactId>jdos-sm</artifactId>
+      <version>${jdos.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.jdos</groupId>
+      <artifactId>jdos-common</artifactId>
+      <version>${jdos.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.phat</groupId>
+      <artifactId>phat-devices</artifactId>
+      <version>${phat.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.phat</groupId>
+      <artifactId>phat-api-server</artifactId>
+      <version>${phat.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.thetransactioncompany</groupId>
+      <artifactId>jsonrpc2-base</artifactId>
+      <version>1.38</version>
+    </dependency>
+    <dependency>
+      <groupId>org.reflections</groupId>
+      <artifactId>reflections</artifactId>
+      <version>0.9.10</version>
+    </dependency>-->
   </dependencies>
 
   <build>
@@ -79,6 +139,37 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <version>2.2</version>
       </plugin>
+      <!--       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>1.7.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <finalName>${project.artifactId}-${project.version}-selfcontained</finalName>
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>test.RemoteClientTest</mainClass>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin> -->
     </plugins>
     <pluginManagement>
       <plugins>
@@ -99,7 +190,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore/>
+                    <ignore />
                   </action>
                 </pluginExecution>
               </pluginExecutions>
@@ -109,7 +200,6 @@
       </plugins>
     </pluginManagement>
   </build>
-
   <repositories>
     <repository>
       <id>java.net-m2</id>
@@ -121,10 +211,9 @@
       <name>sonatype public</name>
       <url>https://oss.sonatype.org/content/groups/public/</url>
     </repository>
-     <repository>
-        <id>Eclipse Paho Repo</id>
-        <url>https://repo.eclipse.org/content/repositories/paho-releases/></url>
+    <repository>
+      <id>Eclipse Paho Repo</id>
+      <url>https://repo.eclipse.org/content/repositories/paho-releases/&gt;</url>
     </repository>
   </repositories>
-
 </project>

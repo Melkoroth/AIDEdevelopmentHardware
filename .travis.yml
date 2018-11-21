@@ -1,5 +1,7 @@
 matrix:
   include:
+
+  #ESP8266 Project
   - language: python
     python: "2.7"
     cache:
@@ -24,11 +26,25 @@ matrix:
     script:
       - platformio ci --board=d1_mini_pro --lib="." --lib="/tmp/OLED_Display_96X96-master" --lib="/tmp/pubsubclient-master" --lib="/tmp/Adafruit_MPR121-master"
 
+  #JAVA MQTT Test
   - language: java
     jdk: "openjdk8"
 
     before_install:
       cd mqttJava
+
+    install:
+      - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+
+    script:
+      - mvn test -B
+
+  #JAVA Main Hardware Link
+  - language: java
+    jdk: "openjdk8"
+
+    before_install:
+      cd phatHardwareLink
 
     install:
       - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
