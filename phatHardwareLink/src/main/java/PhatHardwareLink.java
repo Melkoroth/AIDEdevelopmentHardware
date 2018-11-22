@@ -19,10 +19,7 @@ import javax.swing.JPanel;
 import phat.app.PHATApplication;
 import phat.app.PHATInitAppListener;
 import phat.body.BodiesAppState;
-import phat.body.commands.GoToSpaceCommand;
-import phat.body.commands.SetBodyInHouseSpaceCommand;
-import phat.body.commands.SetSpeedDisplacemenetCommand;
-import phat.body.commands.TremblingHandCommand;
+import phat.body.commands.*;
 import phat.commands.PHATCommand;
 import phat.devices.DevicesAppState;
 import phat.commands.PHATCommandListener;
@@ -76,38 +73,42 @@ public class PhatHardwareLink implements PHATInitAppListener, PHATCommandListene
 
         AppStateManager stateManager = app.getStateManager();
 
+        //Init camera
         app.getFlyByCamera().setMoveSpeed(10f);
-
-        app.getCamera().setLocation(new Vector3f(0.2599395f, 2.7232018f, 3.373138f));
-        app.getCamera().setRotation(new Quaternion(-0.0035931943f, 0.9672268f, -0.25351822f, -0.013704466f));
+        app.getFlyByCamera().setDragToRotate(true);
+        app.getCamera().setFrustumPerspective(45f, (float) app.getCamera().getWidth() / app.getCamera().getHeight(),
+                0.1f, 1000f);
+        app.getCamera().setLocation(new Vector3f(6.2354145f, 18.598438f, 4.6557f));
+        app.getCamera().setRotation(new Quaternion(0.5041053f, -0.49580166f, 0.5068195f, 0.4931456f));
 
         BulletAppState bulletAppState = new BulletAppState();
         bulletAppState.setThreadingType(BulletAppState.ThreadingType.PARALLEL);
         stateManager.attach(bulletAppState);
         bulletAppState.getPhysicsSpace().setAccuracy(1 / 60f);
-        bulletAppState.setDebugEnabled(true);
+        //bulletAppState.setDebugEnabled(true);
 
+        //Init World
         worldAppState = new WorldAppState();
         worldAppState.setLandType(WorldAppState.LandType.Grass);
         app.getStateManager().attach(worldAppState);
         worldAppState.setCalendar(2018, 1, 1, 2, 30, 0);
-        worldAppState.setTimeVisible(true);
+        worldAppState.setVisibleCalendar(true);
 
+        //Init house
         houseAppState = new HouseAppState();
         houseAppState.runCommand(new CreateHouseCommand(houseId, HouseFactory.HouseType.House3room2bath));
         app.getStateManager().attach(houseAppState);
 
-        Debug.enableDebugGrid(10, app.getAssetManager(), app.getRootNode());
+        //Init body
         bodiesAppState = new BodiesAppState();
         stateManager.attach(bodiesAppState);
+        bodiesAppState.createBody(BodiesAppState.BodyType.Young, bodyId);    
+        bodiesAppState.runCommand(new SetBodyInHouseSpaceCommand(bodyId ,houseId, "BedRoom1LeftSide"));
 
-        bodiesAppState.createBody(BodiesAppState.BodyType.Elder, bodyId);
-        //bodiesAppState.runCommand(new SetBodyInCoordenatesCommand(bodyId, Vector3f.ZERO));
-        bodiesAppState.runCommand(new SetBodyInHouseSpaceCommand(bodyId, houseId, "BedRoom1"));
-        //bodiesAppState.runCommand(new RandomWalkingCommand(bodyId, true));
         bodiesAppState.runCommand(new TremblingHandCommand(bodyId, true, true));
         bodiesAppState.runCommand(new SetSpeedDisplacemenetCommand(bodyId, 1.5f));
 
+        //Init sensors
         devicesAppState = new DevicesAppState();
         stateManager.attach(devicesAppState);
 
@@ -147,11 +148,6 @@ public class PhatHardwareLink implements PHATInitAppListener, PHATCommandListene
             @Override
             public void update(float f) {
                 if (!init) {
-                    /*AccelerometerControl ac = devicesAppState.getDevice("Smartphone1").getControl(AccelerometerControl.class);
-                     //ac.setMode(AccelerometerControl.AMode.ACCELEROMETER_MODE);
-                     XYAccelerationsChart chart = new XYAccelerationsChart("Chart - Acc.", "Smartphone1 accelerations", "m/s2", "x,y,z");
-                     ac.add(chart);
-                     chart.showWindow();*/
                     init = true;
                     bodiesAppState.runCommand(goToRandomRoom());
                 }

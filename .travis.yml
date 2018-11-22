@@ -39,6 +39,19 @@ matrix:
     script:
       - mvn test -B
 
+  #JAVA MQTT Broker Test
+  - language: java
+    jdk: "openjdk8"
+
+    before_install:
+      cd mqttJavaServer
+
+    install:
+      - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+
+    script:
+      - mvn test -B
+
   #JAVA Main Hardware Link
   - language: java
     jdk: "openjdk8"

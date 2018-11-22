@@ -7,7 +7,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import java.nio.charset.StandardCharsets;
 
-public class MqttPublishSample {
+public class MqttBrokerSample {
 
     public static void main(String[] args) {
 

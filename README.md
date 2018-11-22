@@ -33,11 +33,14 @@ mosquitto_pub -h localhost -t "anyTopic" -m "message"
 *  ESP subscribes to *subESP*
 *  JAVA publishes to *subESP*
 
-## MqttPublishSample
+## JAVA, Maven and ANT install
+Please refer to the "Getting Started" section of [AIDEdevelopment's README](https://github.com/Melkoroth/AIDEdevelopment/blob/master/README.md)
+
+## mqttJava - MqttPublishSample
 [![OpenJDK Version](https://img.shields.io/badge/openjdk-v1.8-red.svg)](http://openjdk.java.net/)
 [![Maven Version](https://img.shields.io/badge/maven-v3.1.1-orange.svg)](http://maven.apache.org/)
 
-If you need help installing the necesary JAVA stuff, please refer to [PHATSIM's Readme](https://github.com/Grasia/phatsim) 
+If you need help installing the neccesary JAVA stuff, please refer to [PHATSIM's Readme](https://github.com/Grasia/phatsim) 
 
 To send a test message from JAVA:
 ```bash
@@ -47,7 +50,28 @@ mvn exec:java -Dexec.mainClass=aide.harware.mqttTest.MqttPublishSample
 ```
 You should see message info in mosquitto's screen and in serial monitor.
 
-## espHardware sketch
+## basePhatSim 
+[![OpenJDK Version](https://img.shields.io/badge/openjdk-v1.8-red.svg)](http://openjdk.java.net/)
+[![Maven Version](https://img.shields.io/badge/maven-v3.1.1-orange.svg)](http://maven.apache.org/)
+[![Ant Version](https://img.shields.io/badge/ant-v1.8.2-yellow.svg)](http://ant.apache.org/)
+
+This example, developed using [SociAALML Editor](https://github.com/Grasia/sociaalml), is used as the base simulation in which the presence detector and rest of the development will be added.
+
+To run the editor:
+```bash
+cd basePhatSim
+mvn clean compile
+ant edit
+```
+
+To watch the simulation:
+```bash
+cd basePhatSim
+mvn clean compile
+ant runSimPresence
+```
+
+## espHardware
 By default ESP publishes every 5 seconds to *pubESP* and any message sent to *subESP* is written to serial.
 
 ## Why ESP8266?
