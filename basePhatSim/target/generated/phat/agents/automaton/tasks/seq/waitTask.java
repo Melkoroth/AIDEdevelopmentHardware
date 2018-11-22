@@ -34,8 +34,8 @@ public class waitTask extends SeqTaskAutomaton {
                 
                 if(getParent() != null && getParent().getMetadata("") != null) {
                     automaton.setFinishCondition(new TimerFinishedCondition(0, 0, Integer.parseInt(getParent().getMetadata(""))));
-                } else if(!"5".equals("-1")) {
-                    automaton.setFinishCondition(new TimerFinishedCondition(0, 0, 5));
+                } else if(!"1".equals("-1")) {
+                    automaton.setFinishCondition(new TimerFinishedCondition(0, 0, 1));
                 }
                 
                 

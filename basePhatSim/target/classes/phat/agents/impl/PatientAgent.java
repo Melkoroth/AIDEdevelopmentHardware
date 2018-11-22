@@ -23,10 +23,5 @@ public class PatientAgent extends HumanAgent {
             setDiseaseManager(new symptoms_specs_Patient(this, simulation));
 	
         
-            getEventManager().addMap("BEvent0", 
-                new EventProcessor("BEvent0", 
-	    				new EmptyCondition(), 
-	    				BActivity3Activity.class));
-	    	
     }
 }

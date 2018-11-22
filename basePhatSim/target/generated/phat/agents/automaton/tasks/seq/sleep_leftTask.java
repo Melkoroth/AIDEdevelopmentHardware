@@ -27,7 +27,7 @@ public class sleep_leftTask extends SeqTaskAutomaton {
                         
                 ).setCanBeInterrupted(true)
                  .setMetadata("SOCIAALML_DESCRIPTION", "")
-                 .setMetadata("SOCIAALML_ENTITY_ID", "BGoToTask7")
+                 .setMetadata("SOCIAALML_ENTITY_ID", "BGoToTask1")
                  .setMetadata("SOCIAALML_ENTITY_TYPE", "BGoToTask");
                 
                 
@@ -51,7 +51,7 @@ public class sleep_leftTask extends SeqTaskAutomaton {
                         
                 ).setCanBeInterrupted(true)
                  .setMetadata("SOCIAALML_DESCRIPTION", "")
-                 .setMetadata("SOCIAALML_ENTITY_ID", "GoIntoBed1")
+                 .setMetadata("SOCIAALML_ENTITY_ID", "GoIntoBed0")
                  .setMetadata("SOCIAALML_ENTITY_TYPE", "GoIntoBed");
                 
                 
@@ -59,8 +59,8 @@ public class sleep_leftTask extends SeqTaskAutomaton {
                 
                 if(getParent() != null && getParent().getMetadata("") != null) {
                     automaton.setFinishCondition(new TimerFinishedCondition(0, 0, Integer.parseInt(getParent().getMetadata(""))));
-                } else if(!"1".equals("-1")) {
-                    automaton.setFinishCondition(new TimerFinishedCondition(0, 0, 1));
+                } else if(!"5".equals("-1")) {
+                    automaton.setFinishCondition(new TimerFinishedCondition(0, 0, 5));
                 }
                 
                 
@@ -79,7 +79,7 @@ public class sleep_leftTask extends SeqTaskAutomaton {
                         
                 ).setCanBeInterrupted(true)
                  .setMetadata("SOCIAALML_DESCRIPTION", "")
-                 .setMetadata("SOCIAALML_ENTITY_ID", "FallSleep1")
+                 .setMetadata("SOCIAALML_ENTITY_ID", "FallSleep0")
                  .setMetadata("SOCIAALML_ENTITY_TYPE", "FallSleep");
                 
                 
@@ -87,8 +87,8 @@ public class sleep_leftTask extends SeqTaskAutomaton {
                 
                 if(getParent() != null && getParent().getMetadata("") != null) {
                     automaton.setFinishCondition(new TimerFinishedCondition(0, 0, Integer.parseInt(getParent().getMetadata(""))));
-                } else if(!"10".equals("-1")) {
-                    automaton.setFinishCondition(new TimerFinishedCondition(0, 0, 10));
+                } else if(!"30".equals("-1")) {
+                    automaton.setFinishCondition(new TimerFinishedCondition(0, 0, 30));
                 }
                 
                 

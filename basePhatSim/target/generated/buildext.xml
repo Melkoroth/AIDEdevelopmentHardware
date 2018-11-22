@@ -1,7 +1,7 @@
 
 <project>
     
-<target name="runSimNoSymptoms" depends="compile">
+<target name="runSimPresence" depends="compile">
         <condition property="arg.ml" value="-ml">
             <isset property="ml"/>
         </condition>
@@ -19,7 +19,7 @@
         <echoproperties regex="arg.sv"/>
         <echoproperties regex="arg.record"/>
         <java fork="true" failonerror="true" maxmemory="300m"
-              classname="phat.sim.MainSimNoSymptomsPHATSimulation">
+              classname="phat.sim.MainSimPresencePHATSimulation">
             <arg value="${arg.ml}"/>
             <arg value="${arg.fps}"/>
             <arg value="${arg.sv}"/>
@@ -30,7 +30,7 @@
             </classpath>
         </java>
     </target>
-    <target name="runSimNoSymptomsNoDevices" depends="compile">
+    <target name="runSimPresenceNoDevices" depends="compile">
         <condition property="arg.ml" value="-ml">
             <isset property="ml"/>
         </condition>
@@ -44,7 +44,7 @@
         <echoproperties regex="arg.ml"/>
         <echoproperties regex="arg.sv"/>
         <java fork="true" failonerror="true" maxmemory="300m"
-              classname="phat.sim.MainSimNoSymptomsPHATSimulationNoDevices">
+              classname="phat.sim.MainSimPresencePHATSimulationNoDevices">
             <arg value="${arg.ml}"/>
             <arg value="${arg.fps}"/>
             <arg value="${arg.sv}"/>
@@ -54,7 +54,7 @@
             </classpath>
         </java>
     </target>
-    <target name="runSimNoSymptomsNoDevicesRecord" depends="compile">
+    <target name="runSimPresenceNoDevicesRecord" depends="compile">
         <condition property="arg.ml" value="-ml">
             <isset property="ml"/>
         </condition>
@@ -68,7 +68,7 @@
         <echoproperties regex="arg.ml"/>
         <echoproperties regex="arg.sv"/>
         <java fork="true" failonerror="true" maxmemory="300m"
-              classname="phat.sim.MainSimNoSymptomsPHATSimulationNoDevicesRecord">
+              classname="phat.sim.MainSimPresencePHATSimulationNoDevicesRecord">
             <arg value="${arg.ml}"/>
             <arg value="${arg.fps}"/>
             <arg value="${arg.sv}"/>
@@ -79,17 +79,17 @@
         </java>
     </target>
 
-    <target name="runSimNoSymptomsOnlyDevices" depends="compile">
+    <target name="runSimPresenceOnlyDevices" depends="compile">
         <java fork="true" failonerror="true" maxmemory="300m"
-              classname="phat.sim.MainSimNoSymptomsPHATSimulationOnlyDevices">
+              classname="phat.sim.MainSimPresencePHATSimulationOnlyDevices">
             <classpath>			  
                 <pathelement path="${maven.build.outputDir}" />
                 <pathelement path="${mavenclasspath}" />              
             </classpath>
         </java>
     </target>
-    <target name="packageSimNoSymptoms" depends="compile">
-        <maven basedir="${pom.dir}" goal="package" resultproperty="maven.build.result" options="-e -Dbuild.for.prod=false -Djavac.debug=true -Djavac.optimize=false -Dshade.mainName=SimNoSymptoms -Dshade.mainClass=phat.sim.MainSimNoSymptomsPHATSimulation"/>
+    <target name="packageSimPresence" depends="compile">
+        <maven basedir="${pom.dir}" goal="package" resultproperty="maven.build.result" options="-e -Dbuild.for.prod=false -Djavac.debug=true -Djavac.optimize=false -Dshade.mainName=SimPresence -Dshade.mainClass=phat.sim.MainSimPresencePHATSimulation"/>
     </target>
 
     

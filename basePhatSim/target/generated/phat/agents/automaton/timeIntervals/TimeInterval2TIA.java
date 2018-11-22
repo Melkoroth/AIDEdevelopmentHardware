@@ -23,16 +23,16 @@ public class TimeInterval2TIA extends TimeIntervalAutomaton {
 	@Override
 	public void initSubAutomaton() {
 		FSM fsm = new FSM(agent, 1,"FSM-TimeInterval2TIA");
-		ActivityAutomaton BActivity0Activity = new BActivity0Activity(agent, "BActivity0");
+		ActivityAutomaton BActivity1Activity = new BActivity1Activity(agent, "BActivity1");
 		
                 
                 
-    	fsm.registerStartState(BActivity0Activity);
+    	fsm.registerStartState(BActivity1Activity);
     	
         
     	
         
-        fsm.registerFinalState(BActivity0Activity);
+        fsm.registerFinalState(BActivity1Activity);
     	// DoNothing due to no activity defined
     	
     	
@@ -40,6 +40,6 @@ public class TimeInterval2TIA extends TimeIntervalAutomaton {
 	}
         
         public Automaton getDefaultState(PHATInterface phatInterface) {
-            return new waitTask(agent, "wait");
+            return new sleepTask(agent, "sleep");
         }
 }

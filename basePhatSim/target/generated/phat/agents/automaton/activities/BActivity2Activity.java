@@ -11,11 +11,11 @@ public class BActivity2Activity extends ActivityAutomaton {
         super(agent, name);
         setMetadata("SOCIAALML_ENTITY_ID", "BActivity2");
         setMetadata("SOCIAALML_ENTITY_TYPE", "BActivity");
-        setMetadata("SOCIAALML_DESCRIPTION", "Sleeping");
+        setMetadata("SOCIAALML_DESCRIPTION", "");
     }
 	
 	@Override
 	public void initTasks() {
-            addTransition(new sleep_rightTask(agent, "sleep_right"), false);	
+            addTransition(new wake_up_and_go_to_peeTask(agent, "wake_up_and_go_to_pee"), false);	
 	}
 }

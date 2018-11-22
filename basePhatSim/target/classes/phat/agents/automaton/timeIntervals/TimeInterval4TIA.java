@@ -11,28 +11,28 @@ import phat.agents.automaton.Transition;
 import phat.agents.Agent;
 import phat.PHATInterface;
 
-public class TimeInterval3TIA extends TimeIntervalAutomaton {
+public class TimeInterval4TIA extends TimeIntervalAutomaton {
 
-    public TimeInterval3TIA(Agent agent, String name) {
+    public TimeInterval4TIA(Agent agent, String name) {
         super(agent, name);
-        setMetadata("SOCIAALML_ENTITY_ID", "TimeInterval3");
+        setMetadata("SOCIAALML_ENTITY_ID", "TimeInterval4");
         setMetadata("SOCIAALML_ENTITY_TYPE", "TimeInterval");
         //setMetadata("SOCIAALML_ENTITY_TYPE", "");
     }
 	
 	@Override
 	public void initSubAutomaton() {
-		FSM fsm = new FSM(agent, 1,"FSM-TimeInterval3TIA");
-		ActivityAutomaton BActivity2Activity = new BActivity2Activity(agent, "BActivity2");
+		FSM fsm = new FSM(agent, 1,"FSM-TimeInterval4TIA");
+		ActivityAutomaton BActivity1Activity = new BActivity1Activity(agent, "BActivity1");
 		
                 
                 
-    	fsm.registerStartState(BActivity2Activity);
+    	fsm.registerStartState(BActivity1Activity);
     	
         
     	
         
-        fsm.registerFinalState(BActivity2Activity);
+        fsm.registerFinalState(BActivity1Activity);
     	// DoNothing due to no activity defined
     	
     	
@@ -40,6 +40,6 @@ public class TimeInterval3TIA extends TimeIntervalAutomaton {
 	}
         
         public Automaton getDefaultState(PHATInterface phatInterface) {
-            return new waitTask(agent, "wait");
+            return new sleepTask(agent, "sleep");
         }
 }

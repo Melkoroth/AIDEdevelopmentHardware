@@ -23,16 +23,16 @@ public class TimeInterval3TIA extends TimeIntervalAutomaton {
 	@Override
 	public void initSubAutomaton() {
 		FSM fsm = new FSM(agent, 1,"FSM-TimeInterval3TIA");
-		ActivityAutomaton BActivity0Activity = new BActivity0Activity(agent, "BActivity0");
+		ActivityAutomaton BActivity2Activity = new BActivity2Activity(agent, "BActivity2");
 		
                 
                 
-    	fsm.registerStartState(BActivity0Activity);
+    	fsm.registerStartState(BActivity2Activity);
     	
         
     	
         
-        fsm.registerFinalState(BActivity0Activity);
+        fsm.registerFinalState(BActivity2Activity);
     	// DoNothing due to no activity defined
     	
     	

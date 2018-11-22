@@ -7,11 +7,11 @@ import phat.agents.automaton.uses.*;
 import phat.agents.events.*;
 import phat.agents.Agent;
 
-public class sleep_leftTask extends SeqTaskAutomaton {
+public class wake_up_and_go_to_peeTask extends SeqTaskAutomaton {
 
-	public sleep_leftTask(Agent agent, String name) {
+	public wake_up_and_go_to_peeTask(Agent agent, String name) {
             super(agent, name);
-            setMetadata("SOCIAALML_ENTITY_ID", "sleep_left");
+            setMetadata("SOCIAALML_ENTITY_ID", "wake_up_and_go_to_pee");
             setMetadata("SOCIAALML_ENTITY_TYPE", "SequentialTaskDiagram");
             setMetadata("SOCIAALML_DESCRIPTION", "");
         }
@@ -20,39 +20,14 @@ public class sleep_leftTask extends SeqTaskAutomaton {
 	public void initTasks() {
 		
 		{
-                Automaton automaton = new MoveToSpace(
+                Automaton automaton = new StandUpAutomaton(
                         agent, 
-                        "MoveToSpace"
-                        , "BedRoom1LeftSide"
+                        "StandUpAutomaton"
                         
                 ).setCanBeInterrupted(true)
                  .setMetadata("SOCIAALML_DESCRIPTION", "")
-                 .setMetadata("SOCIAALML_ENTITY_ID", "BGoToTask1")
-                 .setMetadata("SOCIAALML_ENTITY_TYPE", "BGoToTask");
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-		
-                    addTransition(automaton, false);
-                } 
-                
-		{
-                Automaton automaton = new GoIntoBedAutomaton(
-                        agent, 
-                        "GoIntoBedAutomaton"
-                        , "Bed1"
-                        
-                ).setCanBeInterrupted(true)
-                 .setMetadata("SOCIAALML_DESCRIPTION", "")
-                 .setMetadata("SOCIAALML_ENTITY_ID", "GoIntoBed0")
-                 .setMetadata("SOCIAALML_ENTITY_TYPE", "GoIntoBed");
+                 .setMetadata("SOCIAALML_ENTITY_ID", "BGetUpFromBed1")
+                 .setMetadata("SOCIAALML_ENTITY_TYPE", "BGetUpFromBed");
                 
                 
                 
@@ -73,22 +48,47 @@ public class sleep_leftTask extends SeqTaskAutomaton {
                 } 
                 
 		{
-                Automaton automaton = new SleepAutomaton(
+                Automaton automaton = new MoveToSpace(
                         agent, 
-                        "SleepAutomaton"
+                        "MoveToSpace"
+                        , "BathRoom1"
                         
                 ).setCanBeInterrupted(true)
                  .setMetadata("SOCIAALML_DESCRIPTION", "")
-                 .setMetadata("SOCIAALML_ENTITY_ID", "FallSleep0")
-                 .setMetadata("SOCIAALML_ENTITY_TYPE", "FallSleep");
+                 .setMetadata("SOCIAALML_ENTITY_ID", "BGoToTask0")
+                 .setMetadata("SOCIAALML_ENTITY_TYPE", "BGoToTask");
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+		
+                    addTransition(automaton, false);
+                } 
+                
+		{
+                Automaton automaton = new UseObjectAutomaton(
+                        agent, 
+                        "UseObjectAutomaton"
+                        , "WC1"
+                        
+                ).setCanBeInterrupted(true)
+                 .setMetadata("SOCIAALML_DESCRIPTION", "")
+                 .setMetadata("SOCIAALML_ENTITY_ID", "BUseTask0")
+                 .setMetadata("SOCIAALML_ENTITY_TYPE", "BUseTask");
                 
                 
                 
                 
                 if(getParent() != null && getParent().getMetadata("") != null) {
                     automaton.setFinishCondition(new TimerFinishedCondition(0, 0, Integer.parseInt(getParent().getMetadata(""))));
-                } else if(!"30".equals("-1")) {
-                    automaton.setFinishCondition(new TimerFinishedCondition(0, 0, 30));
+                } else if(!"60".equals("-1")) {
+                    automaton.setFinishCondition(new TimerFinishedCondition(0, 0, 60));
                 }
                 
                 

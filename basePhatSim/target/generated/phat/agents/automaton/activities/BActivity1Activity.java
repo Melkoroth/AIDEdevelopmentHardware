@@ -11,7 +11,7 @@ public class BActivity1Activity extends ActivityAutomaton {
         super(agent, name);
         setMetadata("SOCIAALML_ENTITY_ID", "BActivity1");
         setMetadata("SOCIAALML_ENTITY_TYPE", "BActivity");
-        setMetadata("SOCIAALML_DESCRIPTION", "Sleeping");
+        setMetadata("SOCIAALML_DESCRIPTION", "");
     }
 	
 	@Override

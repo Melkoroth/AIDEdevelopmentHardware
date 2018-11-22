@@ -7,11 +7,11 @@ import phat.agents.automaton.uses.*;
 import phat.agents.events.*;
 import phat.agents.Agent;
 
-public class waitTask extends SeqTaskAutomaton {
+public class sleepTask extends SeqTaskAutomaton {
 
-	public waitTask(Agent agent, String name) {
+	public sleepTask(Agent agent, String name) {
             super(agent, name);
-            setMetadata("SOCIAALML_ENTITY_ID", "wait");
+            setMetadata("SOCIAALML_ENTITY_ID", "sleep");
             setMetadata("SOCIAALML_ENTITY_TYPE", "SequentialTaskDiagram");
             setMetadata("SOCIAALML_DESCRIPTION", "");
         }
@@ -20,14 +20,14 @@ public class waitTask extends SeqTaskAutomaton {
 	public void initTasks() {
 		
 		{
-                Automaton automaton = new DoNothing(
+                Automaton automaton = new SleepAutomaton(
                         agent, 
-                        "DoNothing"
+                        "SleepAutomaton"
                         
                 ).setCanBeInterrupted(true)
                  .setMetadata("SOCIAALML_DESCRIPTION", "")
-                 .setMetadata("SOCIAALML_ENTITY_ID", "WaitTask0")
-                 .setMetadata("SOCIAALML_ENTITY_TYPE", "WaitTask");
+                 .setMetadata("SOCIAALML_ENTITY_ID", "FallSleep1")
+                 .setMetadata("SOCIAALML_ENTITY_TYPE", "FallSleep");
                 
                 
                 
