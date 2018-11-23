@@ -54,6 +54,13 @@ public class PhatHardwareLink implements PHATInitAppListener, PHATCommandListene
     String houseId = "House1";
     JFrame sensorMonitor;
 
+    String mqttTopic = "presence";
+    int mqttQos = 2;
+    String mqttBroker = "tcp://localhost:1986";
+    String mqttClientId = "PhatHardwareLink";
+
+    MemoryPersistence mqttPersistence = new MemoryPersistence();
+
     public static void main(String[] args) {
         PhatHardwareLink test = new PhatHardwareLink();
         PHATApplication phat = new PHATApplication(test);
@@ -65,6 +72,32 @@ public class PhatHardwareLink implements PHATInitAppListener, PHATCommandListene
         settings.setHeight(960);
         phat.setSettings(settings);
         phat.start();
+    }
+
+    //TODO: Separar init de mensaje en si
+    private void sendMQTTmessage(String msg) {
+    	try {
+            MqttClient sampleClient = new MqttClient(mqttBroker, mqttClientId, mqttPersistence);
+            MqttConnectOptions connOpts = new MqttConnectOptions();
+            connOpts.setCleanSession(true);
+            System.out.println("Connecting to broker: "+mqttBroker);
+            sampleClient.connect(connOpts);
+            System.out.println("Connected");
+            System.out.println("Publishing message: "+msg);
+            MqttMessage message = new MqttMessage(msg.getBytes(StandardCharsets.UTF_8));
+            message.setQos(mqttQos);
+            sampleClient.publish(mqttTopic, message);
+            System.out.println("Message published");
+            sampleClient.disconnect();
+            System.out.println("Disconnected");
+        } catch(MqttException me) {
+            System.out.println("reason "+me.getReasonCode());
+            System.out.println("msg "+me.getMessage());
+            System.out.println("loc "+me.getLocalizedMessage());
+            System.out.println("cause "+me.getCause());
+            System.out.println("excep "+me);
+            me.printStackTrace();
+        }
     }
 
     @Override
@@ -169,6 +202,8 @@ public class PhatHardwareLink implements PHATInitAppListener, PHATCommandListene
         return cpsc;
     }
 
+    //TODO: Generate full message
+    //TODO: Use preseence/bedroom for topic
     @Override
     public void commandStateChanged(PHATCommand command) {
         if (command instanceof CreatePresenceSensorCommand) {
@@ -181,6 +216,7 @@ public class PhatHardwareLink implements PHATInitAppListener, PHATCommandListene
                     psControl.add(psp1);
                     sensorMonitor.getContentPane().add(psp1);
                     sensorMonitor.pack();
+                    sendMQTTmessage(psNode.toString());
                 }
             }
         }
