@@ -2,3 +2,5 @@
 /assets/
 /out/
 /*/target/
+/.idea/
+*.iml
