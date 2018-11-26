@@ -26,6 +26,27 @@ matrix:
     script:
       - platformio ci --board=d1_mini_pro --lib="." --lib="/tmp/OLED_Display_96X96-master" --lib="/tmp/pubsubclient-master" --lib="/tmp/Adafruit_MPR121-master"
 
+  #Circuit Playground Express Project
+  - language: python
+    python: "2.7"
+    cache:
+      directories: 
+        - "~/.platformio"
+
+    env:
+      - PLATFORMIO_CI_SRC=circuitPlaygroundHardware/src/espHardware.ino
+
+    install:
+      - pip install -U platformio
+      - platformio update
+
+      #External libraries
+      - wget https://github.com/adafruit/Adafruit_CircuitPlayground/archive/master.zip -O /tmp/Adafruit_CircuitPlayground.zip
+      - unzip /tmp/Adafruit_CircuitPlayground.zip -d /tmp
+
+    script:
+      - platformio ci --board=d1_mini_pro --lib="." --lib="/tmp/Adafruit_CircuitPlayground-master"
+
   #JAVA MQTT Test
   - language: java
     jdk: "openjdk8"

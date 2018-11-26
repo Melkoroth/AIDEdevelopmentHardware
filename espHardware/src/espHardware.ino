@@ -75,7 +75,7 @@ void setup(void) {
     //Init Serial
     Serial.begin(115200);
     Sprintln();
-    Sprintln("Hello World!");
+    Sprintln("ESP8266 is Alive!");
 
     //Init I2C
     Wire.begin();

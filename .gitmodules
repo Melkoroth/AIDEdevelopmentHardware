@@ -7,3 +7,7 @@
 [submodule "espHardware/lib/Adafruit_MPR121"]
 	path = espHardware/lib/Adafruit_MPR121
 	url = https://github.com/adafruit/Adafruit_MPR121.git
+
+[submodule "circuitPlaygroundHardware/lib/Adafruit_CircuitPlayground"]
+	path = circuitPlaygroundHardware/lib/Adafruit_CircuitPlayground
+	url = https://github.com/adafruit/Adafruit_CircuitPlayground.git
