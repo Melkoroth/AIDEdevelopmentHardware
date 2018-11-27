@@ -34,7 +34,7 @@ matrix:
         - "~/.platformio"
 
     env:
-      - PLATFORMIO_CI_SRC=circuitPlaygroundHardware/src/espHardware.ino
+      - PLATFORMIO_CI_SRC=circuitPlaygroundHardware/src/circuitPlaygroundHardware.ino
 
     install:
       - pip install -U platformio
