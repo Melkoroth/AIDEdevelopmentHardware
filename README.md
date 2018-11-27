@@ -7,6 +7,10 @@ This project stems from [AIDE for People with Neurodegenerative Diseases](http:/
 
 As it is a derived project which uses [PHATSIM](https://github.com/Grasia/phatsim) we can test the developed hardware in the simulator before implementing it in real-life. For communication between the simulation framework and real hardware MQTT was chosen.
 
+## Projected Cases
+Case 1: PHATSIM's virtual motion detector -> Hardware
+Case 2: Real world motion detector -> Hardware
+
 ## Using the MQTT broker
 MQTT needs a server installed to be used as a MQTT broker. You can use Ubuntu's included one, mosquitto, or an external provider just by changing IP address and port inside the code.
 
