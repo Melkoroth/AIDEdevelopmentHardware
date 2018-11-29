@@ -33,9 +33,8 @@ You can use mosquitto_pub to send a message to any topic:
 mosquitto_pub -h localhost -t "anyTopic" -m "message"
 ```
 ## Topics used
-*  ESP publishes to *pubESP*
-*  ESP subscribes to *subESP*
-*  JAVA publishes to *subESP*
+*  Hardware subscribes to *alertTopic*
+*  Software subscribes to *alertButtonTopic*
 
 ## JAVA, Maven and ANT install
 Please refer to the "Getting Started" section of [AIDEdevelopment's README](https://github.com/Melkoroth/AIDEdevelopment/blob/master/README.md)
