@@ -1,1 +1,7 @@
 *.log
+/target/
+/assets/
+/out/
+/*/target/
+/.idea/
+*.iml

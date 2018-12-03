@@ -68,17 +68,27 @@
       <artifactId>phat-device-server</artifactId>
       <version>${phat.version}</version>
     </dependency>
+    <dependency>
+      <groupId>net.sf.phat</groupId>
+      <artifactId>phat-agents</artifactId>
+      <version>${phat.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.phat</groupId>
+      <artifactId>phat-gui</artifactId>
+      <version>${phat.version}</version>
+    </dependency>
     <dependency> 
       <groupId>org.eclipse.paho</groupId>
       <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
       <version>1.2.0</version>
     </dependency>
-    <!-- <dependency>
+    <!--<dependency>
       <groupId>net.sf.jali</groupId>
       <artifactId>jali-adm</artifactId>
       <version>${jali.version}</version>
     </dependency>
-    <dependency>
+     <dependency>
       <groupId>net.sf.jali</groupId>
       <artifactId>jali-phat-client</artifactId>
       <version>${jali.version}</version>
