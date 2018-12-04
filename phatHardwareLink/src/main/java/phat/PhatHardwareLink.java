@@ -111,7 +111,7 @@ public class PhatHardwareLink implements PHATInitializer, PHATCommandListener {
         CreatePresenceSensorCommand cpsc = new CreatePresenceSensorCommand("PreSen-Bedroom1-1", this);
         cpsc.setEnableDebug(true);
         cpsc.sethAngle(90f);
-        cpsc.setvAngle(45f);
+        cpsc.setvAngle(30f);
         cpsc.setAngleStep(10f);
         phat.deviceConfig.getDevicesAppState().runCommand(cpsc);
         //Create GUI sensor monitor
@@ -130,81 +130,96 @@ public class PhatHardwareLink implements PHATInitializer, PHATCommandListener {
 
     @Override
     public void initAgents(AgentConfigurator agentsConfig) {
+    	//Declare agent
         Agent agent = new HumanAgent(bodyId);
-
+        
+        //Move
         MoveToSpace moveToBathroom1 = new MoveToSpace(agent, "GoToBathRoom1", "BathRoom1");
-
-        UseObjectAutomaton useShower = new UseObjectAutomaton(agent, "Shower1");
-        useShower.setFinishCondition(new TimerFinishedCondition(0, 0, 20));
-
+        MoveToSpace moveToBedroom1 = new MoveToSpace(agent, "GoToBedRoom1", "BedRoom1LeftSide");
+        //Use WC
+        int secondsWC = 10;
         UseObjectAutomaton useWC1 = new UseObjectAutomaton(agent, "WC1");
-        useWC1.setFinishCondition(new TimerFinishedCondition(0, 0, 10));
-
-        UseObjectAutomaton useBasin1 = new UseObjectAutomaton(agent, "Basin1");
-        useBasin1.setFinishCondition(new TimerFinishedCondition(0, 0, 10));
-
-        MoveToSpace moveToBedroom1 = new MoveToSpace(agent, "GoToBedRoom1", "BedRoom1");
-
+        useWC1.setFinishCondition(new TimerFinishedCondition(0, 0, secondsWC));
+        UseObjectAutomaton useWC2 = new UseObjectAutomaton(agent, "WC1");
+        useWC2.setFinishCondition(new TimerFinishedCondition(0, 0, secondsWC));
+        UseObjectAutomaton useWC3 = new UseObjectAutomaton(agent, "WC1");
+        useWC3.setFinishCondition(new TimerFinishedCondition(0, 0, secondsWC));
+        UseObjectAutomaton useWC4 = new UseObjectAutomaton(agent, "WC1");
+        useWC4.setFinishCondition(new TimerFinishedCondition(0, 0, secondsWC));
+        UseObjectAutomaton useWC5 = new UseObjectAutomaton(agent, "WC1");
+        useWC5.setFinishCondition(new TimerFinishedCondition(0, 0, secondsWC));
+        //Get into bed        
         GoIntoBedAutomaton goIntoBed = new GoIntoBedAutomaton(agent, "Bed1");
+        //Sleep
+        int secondsSleep = 10;
+        DoNothing sleep1 = new DoNothing(agent, "Sleep");
+        sleep1.setFinishCondition(new TimerFinishedCondition(0, 0, secondsSleep));
+        DoNothing sleep2 = new DoNothing(agent, "Sleep");
+        sleep2.setFinishCondition(new TimerFinishedCondition(0, 0, secondsSleep));
+        DoNothing sleep3 = new DoNothing(agent, "Sleep");
+        sleep3.setFinishCondition(new TimerFinishedCondition(0, 0, secondsSleep));
+        DoNothing sleep4 = new DoNothing(agent, "Sleep");
+        sleep4.setFinishCondition(new TimerFinishedCondition(0, 0, secondsSleep));
+        DoNothing sleep5 = new DoNothing(agent, "Sleep");
+        sleep5.setFinishCondition(new TimerFinishedCondition(0, 0, secondsSleep));
+        //Get out of bed
+        StandUpAutomaton standUp = new StandUpAutomaton(agent, "StandUpFromBed");
+        //Wait
+        int secondsWait = 5;
+        Automaton wait1 = new DoNothing(agent, "Wait1").setFinishCondition(new TimerFinishedCondition(0, 0, secondsWait));
+        Automaton wait2 = new DoNothing(agent, "Wait1").setFinishCondition(new TimerFinishedCondition(0, 0, secondsWait));
+        Automaton wait3 = new DoNothing(agent, "Wait1").setFinishCondition(new TimerFinishedCondition(0, 0, secondsWait));
+        Automaton wait4 = new DoNothing(agent, "Wait1").setFinishCondition(new TimerFinishedCondition(0, 0, secondsWait));
+        Automaton wait5 = new DoNothing(agent, "Wait1").setFinishCondition(new TimerFinishedCondition(0, 0, secondsWait));
 
-        StandUpAutomaton standUp1 = new StandUpAutomaton(agent, "StandUpFromBed");
-        StandUpAutomaton standUp2 = new StandUpAutomaton(agent, "StandUpFromBed");
-
-        DoNothing sleep = new DoNothing(agent, "Sleep");
-        sleep.setFinishCondition(new TimerFinishedCondition(0, 0, 5));
-
-        MoveToSpace moveToGettingDressedArea1 = new MoveToSpace(agent, "GoToGettingDressedArea1", "GettingDressedArea1");
-
-        MoveToSpace moveToHaveBreakfast = new MoveToSpace(agent, "GoToHaveBreakfast", "Kitchen");
-
-        SitDownAutomaton sitDownInKitchen = new SitDownAutomaton(agent, "Chair1");
-
-        Automaton haveBreakfast = new DrinkAutomaton(agent).setFinishCondition(new TimerFinishedCondition(0, 0, 20));
-
-        UseObjectAutomaton useSink = new UseObjectAutomaton(agent, "Sink");
-        useSink.setFinishCondition(new TimerFinishedCondition(0, 0, 30));
-
-        Automaton wait1 = new DoNothing(agent, "Wait1").setFinishCondition(new TimerFinishedCondition(0, 0, 5));
-        Automaton wait2 = new DoNothing(agent, "Wait2").setFinishCondition(new TimerFinishedCondition(0, 0, 5));
-        Automaton wait3 = new DoNothing(agent, "Wait3").setFinishCondition(new TimerFinishedCondition(0, 0, 5));
-        Automaton wait4 = new DoNothing(agent, "Wait3").setFinishCondition(new TimerFinishedCondition(0, 0, 5));
-
-        UseDoorbellAutomaton useDoorbell = new UseDoorbellAutomaton(agent, "Doorbell1");
-
-        FallAutomaton fall = new FallAutomaton(agent, "TripOver");
-        fall.setFinishCondition(new TimerFinishedCondition(0, 0, 5));
-
-        SayAutomaton say1 = new SayAutomaton(agent, "SayGoodMorning", "--> i need help", 0.5f);
-        SayAutomaton say2 = new SayAutomaton(agent, "SayGoodMorning", "--> where are you", 0.5f);
-        SayAutomaton say3 = new SayAutomaton(agent, "SayGoodMorning", "--> look at me", 0.5f);
-
-        StandUpAutomaton standUp3 = new StandUpAutomaton(agent, "StandUp");
-
-
+        //Create and populate Finite State Machine
+        //Timer conditions are used once and then expire. For this reason code is duplicated
         FSM fsm = new FSM(agent);
         fsm.registerStartState(wait1);
-        fsm.registerTransition(wait1, say1);
-        fsm.registerTransition(say1, wait2);
-        fsm.registerTransition(wait2, say2);
-        fsm.registerTransition(say2, wait3);
-        fsm.registerTransition(wait3, say3);
-        fsm.registerTransition(say3, wait4);
-        fsm.registerTransition(wait4, moveToBathroom1);
-
-        fsm.registerTransition(moveToBathroom1, fall);
-        fsm.registerTransition(fall, standUp3);
-        fsm.registerTransition(standUp3, useShower);
-        fsm.registerTransition(useShower, useWC1);
-        fsm.registerTransition(useWC1, useBasin1);
-        fsm.registerTransition(useBasin1, moveToHaveBreakfast);
-        fsm.registerTransition(moveToHaveBreakfast, sitDownInKitchen);
-        fsm.registerTransition(sitDownInKitchen, haveBreakfast);
-        fsm.registerTransition(haveBreakfast, standUp2);
-        fsm.registerTransition(standUp2, useSink);
-        fsm.registerFinalState(useSink);
+        //We make scene happen various times
+        fsm.registerTransition(wait1, goIntoBed);
+        fsm.registerTransition(goIntoBed, sleep1);
+        fsm.registerTransition(sleep1, standUp);
+        fsm.registerTransition(standUp, moveToBathroom1);
+        fsm.registerTransition(moveToBathroom1, useWC1);
+        fsm.registerTransition(useWC1, moveToBedroom1);
+        fsm.registerTransition(moveToBedroom1, wait2);
+        //Second iteration
+        fsm.registerTransition(wait2, goIntoBed);
+        fsm.registerTransition(goIntoBed, sleep2);
+        fsm.registerTransition(sleep2, standUp);
+        fsm.registerTransition(standUp, moveToBathroom1);
+        fsm.registerTransition(moveToBathroom1, useWC1);
+        fsm.registerTransition(useWC2, moveToBedroom1);
+        fsm.registerTransition(moveToBedroom1, wait3);
+        //Third iteration
+        fsm.registerTransition(wait3, goIntoBed);
+        fsm.registerTransition(goIntoBed, sleep3);
+        fsm.registerTransition(sleep3, standUp);
+        fsm.registerTransition(standUp, moveToBathroom1);
+        fsm.registerTransition(moveToBathroom1, useWC3);
+        fsm.registerTransition(useWC3, moveToBedroom1);
+        fsm.registerTransition(moveToBedroom1, wait4);
+        //Fourth iteration
+        fsm.registerTransition(wait4, goIntoBed);
+        fsm.registerTransition(goIntoBed, sleep4);
+        fsm.registerTransition(sleep4, standUp);
+        fsm.registerTransition(standUp, moveToBathroom1);
+        fsm.registerTransition(moveToBathroom1, useWC4);
+        fsm.registerTransition(useWC4, moveToBedroom1);
+        fsm.registerTransition(moveToBedroom1, wait5);
+        //Fifth iteration
+        fsm.registerTransition(wait5, goIntoBed);
+        fsm.registerTransition(goIntoBed, sleep5);
+        fsm.registerTransition(sleep5, standUp);
+        fsm.registerTransition(standUp, moveToBathroom1);
+        fsm.registerTransition(moveToBathroom1, useWC5);
+        fsm.registerTransition(useWC5, moveToBedroom1);
+        fsm.registerTransition(moveToBedroom1, wait5);
+        //fsm.registerFinalState(wait5s);
 
         fsm.addListener(new AutomatonIcon());
-
+        //Link FSM with agent
         agent.setAutomaton(fsm);
         agentsConfig.add(agent);
 
