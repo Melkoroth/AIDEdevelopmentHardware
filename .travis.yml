@@ -78,7 +78,10 @@ matrix:
     jdk: "openjdk8"
 
     before_install:
-      cd phatHardwareLink
+      git clone https://github.com/Grasia/phatsim.git
+      cd phatsim
+      mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+      cd ../phatHardwareLink
 
     install:
       - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
