@@ -7,8 +7,8 @@
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
-  <groupId>aide.hardware</groupId>
-  <artifactId>phatLink</artifactId>
+  <groupId>phat</groupId>
+  <artifactId>PhatHardwareLink</artifactId>
   <packaging>jar</packaging>
   <version>1.0.0-SNAPSHOT</version>
   <name>AIDE Hardware PHAT Link</name>
@@ -140,46 +140,46 @@
           <source>1.8</source>
           <target>1.8</target>
           <optimize>true</optimize>
-          <showDeprecations>true</showDeprecations>
-          <encoding>ISO-8859-1</encoding>
+      <!--<showDeprecations>true</showDeprecations> -->
+      <encoding>ISO-8859-1</encoding>
+    </configuration>
+  </plugin>
+  <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-dependency-plugin</artifactId>
+    <version>2.2</version>
+  </plugin>
+  <!--       <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-shade-plugin</artifactId>
+    <version>1.7.1</version>
+    <executions>
+      <execution>
+        <phase>package</phase>
+        <goals>
+          <goal>shade</goal>
+        </goals>
+        <configuration>
+          <finalName>${project.artifactId}-${project.version}-selfcontained</finalName>
+          <filters>
+            <filter>
+              <artifact>*:*</artifact>
+              <excludes>
+                <exclude>META-INF/*.SF</exclude>
+                <exclude>META-INF/*.DSA</exclude>
+                <exclude>META-INF/*.RSA</exclude>
+              </excludes>
+            </filter>
+          </filters>
+          <transformers>
+            <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+              <mainClass>test.RemoteClientTest</mainClass>
+            </transformer>
+          </transformers>
         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.2</version>
-      </plugin>
-      <!--       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>1.7.1</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <finalName>${project.artifactId}-${project.version}-selfcontained</finalName>
-              <filters>
-                <filter>
-                  <artifact>*:*</artifact>
-                  <excludes>
-                    <exclude>META-INF/*.SF</exclude>
-                    <exclude>META-INF/*.DSA</exclude>
-                    <exclude>META-INF/*.RSA</exclude>
-                  </excludes>
-                </filter>
-              </filters>
-              <transformers>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <mainClass>test.RemoteClientTest</mainClass>
-                </transformer>
-              </transformers>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin> -->
+      </execution>
+    </executions>
+  </plugin> -->
     </plugins>
     <pluginManagement>
       <plugins>
