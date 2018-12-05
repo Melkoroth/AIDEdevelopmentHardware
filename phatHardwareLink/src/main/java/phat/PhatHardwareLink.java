@@ -10,20 +10,8 @@ import com.jme3.app.state.AppStateManager;
 import com.jme3.scene.Node;
 import phat.agents.Agent;
 import phat.agents.HumanAgent;
-import phat.agents.automaton.Automaton;
-import phat.agents.automaton.AutomatonIcon;
-import phat.agents.automaton.DoNothing;
-import phat.agents.automaton.DrinkAutomaton;
-import phat.agents.automaton.FSM;
-import phat.agents.automaton.FallAutomaton;
-import phat.agents.automaton.GoIntoBedAutomaton;
-import phat.agents.automaton.MoveToSpace;
-import phat.agents.automaton.SayAutomaton;
-import phat.agents.automaton.SitDownAutomaton;
-import phat.agents.automaton.StandUpAutomaton;
-import phat.agents.automaton.UseObjectAutomaton;
+import phat.agents.automaton.*;
 import phat.agents.automaton.conditions.TimerFinishedCondition;
-import phat.agents.automaton.uses.UseDoorbellAutomaton;
 import phat.agents.commands.ActivateActuatorEventsLauncherCommand;
 import phat.agents.commands.ActivateCallStateEventsLauncherCommand;
 import phat.body.BodiesAppState;
@@ -37,6 +25,9 @@ import phat.config.HouseConfigurator;
 import phat.config.ServerConfigurator;
 import phat.config.WorldConfigurator;
 import phat.devices.commands.CreatePresenceSensorCommand;
+import phat.sensors.Sensor;
+import phat.sensors.SensorData;
+import phat.sensors.SensorListener;
 import phat.sensors.presence.PHATPresenceSensor;
 import phat.sensors.presence.PresenceStatePanel;
 import phat.server.ServerAppState;
@@ -55,8 +46,10 @@ import java.nio.charset.StandardCharsets;
  * Phat Hardware Link
  * @author melkoroth
  */
-public class PhatHardwareLink implements PHATInitializer, PHATCommandListener {
+public class PhatHardwareLink implements PHATInitializer, PHATCommandListener, SensorListener {
     static GUIPHATInterface phat;
+
+    PHATPresenceSensor presence;
 
     String bodyId = "Patient";
     String houseId = "House1";
@@ -64,9 +57,11 @@ public class PhatHardwareLink implements PHATInitializer, PHATCommandListener {
 
     String mqttTopic = "presence";
     int mqttQos = 2;
-    String mqttBroker = "tcp://localhost:1986";
-    String mqttClientId = "PhatHardwareLink";
-    MemoryPersistence mqttPersistence = new MemoryPersistence();
+    static String mqttBroker = "tcp://localhost:1986";
+    static String mqttClientId = "PhatHardwareLink";
+    static MemoryPersistence mqttPersistence = new MemoryPersistence();
+    static MqttClient mqttClient;
+    static MqttConnectOptions connOpts;
 
     public static void main(String[] args) {
         //String[] a = {"-record"};
@@ -81,6 +76,19 @@ public class PhatHardwareLink implements PHATInitializer, PHATCommandListener {
         phat.start();
         //Hide prettyLogger from GUI
         phat.hidePrettyLogger();
+
+        startMQTTclient();
+    }
+
+    public static void startMQTTclient() {
+        try {
+            mqttClient = new MqttClient(mqttBroker, mqttClientId, mqttPersistence);
+            connOpts = new MqttConnectOptions();
+            connOpts.setCleanSession(true);
+
+        } catch(MqttException me) {
+            handleMQTTexception(me);
+        }
     }
 
     @Override
@@ -105,6 +113,12 @@ public class PhatHardwareLink implements PHATInitializer, PHATCommandListener {
 
     @Override
     public void initDevices(DeviceConfigurator deviceConfig) {
+        presence = new PHATPresenceSensor("PreSen-Bedroom1-2", phat.getSimTime());
+        presence.add(this);
+        presence.sethAngle(90f);
+        presence.setvAngle(30f);
+        presence.setAngleStep(10f);
+
         AppStateManager stateManager = phat.app.getStateManager();
         stateManager.attach(phat.deviceConfig.getDevicesAppState());
         //Create presence sensor
@@ -113,6 +127,8 @@ public class PhatHardwareLink implements PHATInitializer, PHATCommandListener {
         cpsc.sethAngle(90f);
         cpsc.setvAngle(30f);
         cpsc.setAngleStep(10f);
+        cpsc.setListener(this);
+
         phat.deviceConfig.getDevicesAppState().runCommand(cpsc);
         //Create GUI sensor monitor
         sensorMonitor = new JFrame("Sensor Monitoring");
@@ -136,87 +152,28 @@ public class PhatHardwareLink implements PHATInitializer, PHATCommandListener {
         //Move
         MoveToSpace moveToBathroom1 = new MoveToSpace(agent, "GoToBathRoom1", "BathRoom1");
         MoveToSpace moveToBedroom1 = new MoveToSpace(agent, "GoToBedRoom1", "BedRoom1LeftSide");
-        //Use WC
-        int secondsWC = 10;
-        UseObjectAutomaton useWC1 = new UseObjectAutomaton(agent, "WC1");
-        useWC1.setFinishCondition(new TimerFinishedCondition(0, 0, secondsWC));
-        UseObjectAutomaton useWC2 = new UseObjectAutomaton(agent, "WC1");
-        useWC2.setFinishCondition(new TimerFinishedCondition(0, 0, secondsWC));
-        UseObjectAutomaton useWC3 = new UseObjectAutomaton(agent, "WC1");
-        useWC3.setFinishCondition(new TimerFinishedCondition(0, 0, secondsWC));
-        UseObjectAutomaton useWC4 = new UseObjectAutomaton(agent, "WC1");
-        useWC4.setFinishCondition(new TimerFinishedCondition(0, 0, secondsWC));
-        UseObjectAutomaton useWC5 = new UseObjectAutomaton(agent, "WC1");
-        useWC5.setFinishCondition(new TimerFinishedCondition(0, 0, secondsWC));
-        //Get into bed        
+        //Get into bed
         GoIntoBedAutomaton goIntoBed = new GoIntoBedAutomaton(agent, "Bed1");
-        //Sleep
-        int secondsSleep = 10;
-        DoNothing sleep1 = new DoNothing(agent, "Sleep");
-        sleep1.setFinishCondition(new TimerFinishedCondition(0, 0, secondsSleep));
-        DoNothing sleep2 = new DoNothing(agent, "Sleep");
-        sleep2.setFinishCondition(new TimerFinishedCondition(0, 0, secondsSleep));
-        DoNothing sleep3 = new DoNothing(agent, "Sleep");
-        sleep3.setFinishCondition(new TimerFinishedCondition(0, 0, secondsSleep));
-        DoNothing sleep4 = new DoNothing(agent, "Sleep");
-        sleep4.setFinishCondition(new TimerFinishedCondition(0, 0, secondsSleep));
-        DoNothing sleep5 = new DoNothing(agent, "Sleep");
-        sleep5.setFinishCondition(new TimerFinishedCondition(0, 0, secondsSleep));
         //Get out of bed
         StandUpAutomaton standUp = new StandUpAutomaton(agent, "StandUpFromBed");
-        //Wait
-        int secondsWait = 5;
-        Automaton wait1 = new DoNothing(agent, "Wait1").setFinishCondition(new TimerFinishedCondition(0, 0, secondsWait));
-        Automaton wait2 = new DoNothing(agent, "Wait1").setFinishCondition(new TimerFinishedCondition(0, 0, secondsWait));
-        Automaton wait3 = new DoNothing(agent, "Wait1").setFinishCondition(new TimerFinishedCondition(0, 0, secondsWait));
-        Automaton wait4 = new DoNothing(agent, "Wait1").setFinishCondition(new TimerFinishedCondition(0, 0, secondsWait));
-        Automaton wait5 = new DoNothing(agent, "Wait1").setFinishCondition(new TimerFinishedCondition(0, 0, secondsWait));
+        //Use WC
+        UseObjectAutomaton useWC1 = new UseObjectAutomaton(agent, "WC1");
+        useWC1.setFinishCondition(new TimerFinishedCondition(0, 0, 10));
+        //Sleep
+        SleepAutomaton sleep1 = new SleepAutomaton(agent, "Sleep");
+        sleep1.setFinishCondition(new TimerFinishedCondition(0, 0, 10));
 
         //Create and populate Finite State Machine
         //Timer conditions are used once and then expire. For this reason code is duplicated
         FSM fsm = new FSM(agent);
-        fsm.registerStartState(wait1);
+        fsm.registerStartState(goIntoBed);
         //We make scene happen various times
-        fsm.registerTransition(wait1, goIntoBed);
         fsm.registerTransition(goIntoBed, sleep1);
         fsm.registerTransition(sleep1, standUp);
         fsm.registerTransition(standUp, moveToBathroom1);
         fsm.registerTransition(moveToBathroom1, useWC1);
         fsm.registerTransition(useWC1, moveToBedroom1);
-        fsm.registerTransition(moveToBedroom1, wait2);
-        //Second iteration
-        fsm.registerTransition(wait2, goIntoBed);
-        fsm.registerTransition(goIntoBed, sleep2);
-        fsm.registerTransition(sleep2, standUp);
-        fsm.registerTransition(standUp, moveToBathroom1);
-        fsm.registerTransition(moveToBathroom1, useWC1);
-        fsm.registerTransition(useWC2, moveToBedroom1);
-        fsm.registerTransition(moveToBedroom1, wait3);
-        //Third iteration
-        fsm.registerTransition(wait3, goIntoBed);
-        fsm.registerTransition(goIntoBed, sleep3);
-        fsm.registerTransition(sleep3, standUp);
-        fsm.registerTransition(standUp, moveToBathroom1);
-        fsm.registerTransition(moveToBathroom1, useWC3);
-        fsm.registerTransition(useWC3, moveToBedroom1);
-        fsm.registerTransition(moveToBedroom1, wait4);
-        //Fourth iteration
-        fsm.registerTransition(wait4, goIntoBed);
-        fsm.registerTransition(goIntoBed, sleep4);
-        fsm.registerTransition(sleep4, standUp);
-        fsm.registerTransition(standUp, moveToBathroom1);
-        fsm.registerTransition(moveToBathroom1, useWC4);
-        fsm.registerTransition(useWC4, moveToBedroom1);
-        fsm.registerTransition(moveToBedroom1, wait5);
-        //Fifth iteration
-        fsm.registerTransition(wait5, goIntoBed);
-        fsm.registerTransition(goIntoBed, sleep5);
-        fsm.registerTransition(sleep5, standUp);
-        fsm.registerTransition(standUp, moveToBathroom1);
-        fsm.registerTransition(moveToBathroom1, useWC5);
-        fsm.registerTransition(useWC5, moveToBedroom1);
-        fsm.registerTransition(moveToBedroom1, wait5);
-        //fsm.registerFinalState(wait5s);
+        fsm.registerTransition(moveToBedroom1, goIntoBed);
 
         fsm.addListener(new AutomatonIcon());
         //Link FSM with agent
@@ -243,45 +200,62 @@ public class PhatHardwareLink implements PHATInitializer, PHATCommandListener {
     //Updates GUI for presence sensor
     @Override
     public void commandStateChanged(PHATCommand command) {
+        System.out.println("commandStateChanged");
         if (command instanceof CreatePresenceSensorCommand) {
+            System.out.println("is instance");
             CreatePresenceSensorCommand cpsc = (CreatePresenceSensorCommand) command;
             Node psNode = phat.deviceConfig.getDevicesAppState().getDevice(cpsc.getPresenceSensorId());
             if (psNode != null) {
+                System.out.println("psNode");
                 PHATPresenceSensor psControl = psNode.getControl(PHATPresenceSensor.class);
                 if (psControl != null) {
+                    System.out.println("psControl");
                     PresenceStatePanel psp1 = new PresenceStatePanel();
                     psControl.add(psp1);
                     sensorMonitor.getContentPane().add(psp1);
                     sensorMonitor.pack();
-                    sendMQTTmessage(psNode.toString());
+                    //Attach listener for sensor
+                    phat.deviceConfig.getDevicesAppState().getDevice("PreSen-Bedroom1-1").getControl(PHATPresenceSensor.class).add(this);
                 }
             }
         }
     }
 
-    //TODO: Separar init de mensaje en si
     private void sendMQTTmessage(String msg) {
         try {
-            MqttClient sampleClient = new MqttClient(mqttBroker, mqttClientId, mqttPersistence);
-            MqttConnectOptions connOpts = new MqttConnectOptions();
-            connOpts.setCleanSession(true);
             System.out.println("Connecting to broker: "+mqttBroker);
-            sampleClient.connect(connOpts);
+            mqttClient.connect(connOpts);
             System.out.println("Connected");
             System.out.println("Publishing message: "+msg);
             MqttMessage message = new MqttMessage(msg.getBytes(StandardCharsets.UTF_8));
             message.setQos(mqttQos);
-            sampleClient.publish(mqttTopic, message);
+            mqttClient.publish(mqttTopic, message);
             System.out.println("Message published");
-            sampleClient.disconnect();
+            mqttClient.disconnect();
             System.out.println("Disconnected");
         } catch(MqttException me) {
-            System.out.println("reason "+me.getReasonCode());
-            System.out.println("msg "+me.getMessage());
-            System.out.println("loc "+me.getLocalizedMessage());
-            System.out.println("cause "+me.getCause());
-            System.out.println("excep "+me);
-            me.printStackTrace();
+            handleMQTTexception(me);
         }
+    }
+
+    private static void handleMQTTexception(MqttException me) {
+        System.out.println("reason "+me.getReasonCode());
+        System.out.println("msg "+me.getMessage());
+        System.out.println("loc "+me.getLocalizedMessage());
+        System.out.println("cause "+me.getCause());
+        System.out.println("excep "+me);
+        me.printStackTrace();
+    }
+
+    @Override
+    public void update(Sensor sensor, SensorData sensorData) {
+        System.out.println("Sensor updated");
+        sendMQTTmessage("Sensor updated");
+        System.out.println(phat.deviceConfig.getDevicesAppState().getDevice("PreSen-Bedroom1-1").getControl(PHATPresenceSensor.class).getPresenceData());
+    }
+
+    @Override
+    public void cleanUp() {
+
     }
 }
