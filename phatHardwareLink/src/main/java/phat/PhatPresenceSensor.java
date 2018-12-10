@@ -37,13 +37,6 @@ import phat.server.commands.CreateAllPresenceSensorServersCommand;
 import phat.structures.houses.HouseFactory;
 import phat.world.WorldAppState;
 
-/*import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-import java.nio.charset.StandardCharsets;*/
-
 import phat.MqttBroker;
 import phat.HardwareLink;
 
@@ -190,7 +183,7 @@ public class PhatPresenceSensor implements PHATInitializer, PHATCommandListener,
 
     @Override
     public String getDescription() {
-        return "This is a proof of concept simulation with a presence sensor attached which sends MQTT messages out";
+        return "This is a proof of concept simulation with a presence sensor attached which warns HW";
     }
 
     //Updates GUI for presence sensor

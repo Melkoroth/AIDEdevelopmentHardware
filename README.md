@@ -11,6 +11,23 @@ As it is a derived project which uses [PHATSIM](https://github.com/Grasia/phatsi
 Case 1: PHATSIM's virtual motion detector -> Hardware
 Case 2: Real world motion detector -> Hardware
 
+The important project folders follow:
+
+## phatHardwareLink
+This is the main JAVA project and the brain of the system. It consists of two main classes: **PhatPresenceSensor** and **BeaglePresenceSensor**
+
+Both perform the same duties of managing a presence sensor. The difference is that in PHATSim the sensor is virtual whereas in the BeagleBone a real presence sensor is used.
+
+For this, both call the same methods that init the MQTT broker and client which is used to communicate with the ESP8266 and the Serial which is used to communicate with the Circuit Playground Express. 
+
+## espHardware
+
+## circuitPlaygroundHardware
+
+
+
+---DEPRECATED---
+
 ## Using the MQTT broker
 MQTT needs a server installed to be used as a MQTT broker. You can use Ubuntu's included one, mosquitto, or an external provider just by changing IP address and port inside the code.
 
