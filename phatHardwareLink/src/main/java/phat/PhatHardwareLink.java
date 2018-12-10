@@ -16,6 +16,7 @@ import phat.agents.commands.ActivateActuatorEventsLauncherCommand;
 import phat.agents.commands.ActivateCallStateEventsLauncherCommand;
 import phat.body.BodiesAppState;
 import phat.body.commands.*;
+import phat.client.sensor.presence.PHATPresenceData;
 import phat.commands.PHATCommand;
 import phat.commands.PHATCommandListener;
 import phat.config.AgentConfigurator;
@@ -29,6 +30,7 @@ import phat.sensors.Sensor;
 import phat.sensors.SensorData;
 import phat.sensors.SensorListener;
 import phat.sensors.presence.PHATPresenceSensor;
+import phat.sensors.presence.PresenceData;
 import phat.sensors.presence.PresenceStatePanel;
 import phat.server.ServerAppState;
 import phat.server.commands.CreateAllPresenceSensorServersCommand;
@@ -62,6 +64,13 @@ public class PhatHardwareLink implements PHATInitializer, PHATCommandListener, S
     static MemoryPersistence mqttPersistence = new MemoryPersistence();
     static MqttClient mqttClient;
     static MqttConnectOptions connOpts;
+
+    //Stores previous sensor state to avoid duplicating messages
+    //It's init at true so sim doesn't trigger the warning on start
+    boolean lastPresenceState = true;
+    //Cooldown for sensor. Same reason as above
+    static final long SENSORTIMEOUT = 5000;
+    long lastPresenceTimestamp;
 
     public static void main(String[] args) {
         //String[] a = {"-record"};
@@ -223,16 +232,16 @@ public class PhatHardwareLink implements PHATInitializer, PHATCommandListener, S
 
     private void sendMQTTmessage(String msg) {
         try {
-            System.out.println("Connecting to broker: "+mqttBroker);
+            //System.out.println("Connecting to broker: "+mqttBroker);
             mqttClient.connect(connOpts);
-            System.out.println("Connected");
-            System.out.println("Publishing message: "+msg);
+            //System.out.println("Connected");
+            //System.out.println("Publishing message: "+msg);
             MqttMessage message = new MqttMessage(msg.getBytes(StandardCharsets.UTF_8));
             message.setQos(mqttQos);
             mqttClient.publish(mqttTopic, message);
-            System.out.println("Message published");
+            //System.out.println("Message published");
             mqttClient.disconnect();
-            System.out.println("Disconnected");
+            //System.out.println("Disconnected");
         } catch(MqttException me) {
             handleMQTTexception(me);
         }
@@ -249,9 +258,29 @@ public class PhatHardwareLink implements PHATInitializer, PHATCommandListener, S
 
     @Override
     public void update(Sensor sensor, SensorData sensorData) {
+        PHATPresenceSensor ps = (PHATPresenceSensor)sensor;
+        PresenceData pd = ps.getPresenceData();
+        //If presence detected, coming from a false state and cooldown time passed
+        if (pd.isPresence() && !lastPresenceState && (pd.getTimestamp() - lastPresenceTimestamp > SENSORTIMEOUT)) {
+            sendMQTTmessage("Presence detected!");
+            lastPresenceState = true;
+            lastPresenceTimestamp = pd.getTimestamp();
+        } else if (!pd.isPresence()) {
+            lastPresenceState = false;
+            lastPresenceTimestamp = pd.getTimestamp();
+        }
+        //System.out.println(ps.getPresenceData().getTimestamp());
+        //System.out.println(phat.getSimTime().getTimeInMillis());
+        /*System.out.println("---------------");
         System.out.println("Sensor updated");
         sendMQTTmessage("Sensor updated");
-        System.out.println(phat.deviceConfig.getDevicesAppState().getDevice("PreSen-Bedroom1-1").getControl(PHATPresenceSensor.class).getPresenceData());
+        System.out.println(sensor.getId());
+        System.out.println(sensor.getSpatial());
+        System.out.println(sensor.getClass());
+        PresenceData pd = ps.getPresenceData();
+        System.out.println(pd.isPresence());
+        System.out.println(pd.getTimestamp());
+        System.out.println(phat.deviceConfig.getDevicesAppState().getDevice("PreSen-Bedroom1-1").getControl(PHATPresenceSensor.class).getPresenceData());*/
     }
 
     @Override
