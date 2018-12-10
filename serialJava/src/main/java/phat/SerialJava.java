@@ -2,8 +2,12 @@ package phat;
 
 import com.fazecast.jSerialComm.*;
 
+import java.util.concurrent.TimeUnit;
+
 public class SerialJava {
     static SerialPort circuitPlayground ;
+    final static String triggerAlarmMessage = "a";
+    final static String deactivateAlarmMessage = "d";
 
 	public static void main(String[] args) {
 		SerialPort ports[] = SerialPort.getCommPorts();
@@ -18,7 +22,23 @@ public class SerialJava {
             }
 
             circuitPlayground.openPort();
+		    System.out.println(circuitPlayground.getBaudRate());
+            triggerAlarm();
+            try {
+                TimeUnit.SECONDS.sleep(5);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            deactivateAlarm();
         }
 	}
+
+	static private void triggerAlarm() {
+        circuitPlayground.writeBytes(triggerAlarmMessage.getBytes(), 1);
+    }
+
+    static private void deactivateAlarm() {
+        circuitPlayground.writeBytes(deactivateAlarmMessage.getBytes(), 1);
+    }
 
 }
