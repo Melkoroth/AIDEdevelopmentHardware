@@ -37,21 +37,22 @@ import phat.server.commands.CreateAllPresenceSensorServersCommand;
 import phat.structures.houses.HouseFactory;
 import phat.world.WorldAppState;
 
-import org.eclipse.paho.client.mqttv3.MqttClient;
+/*import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.StandardCharsets;*/
 
-//import phat.MqttBroker;
+import phat.MqttBroker;
+import phat.HardwareLink;
 
 /**
  * Phat Hardware Link
  * @author melkoroth
  */
-public class PhatHardwareLink implements PHATInitializer, PHATCommandListener, SensorListener {
-    static MqttBroker broker = new MqttBroker();
+public class PhatPresenceSensor implements PHATInitializer, PHATCommandListener, SensorListener {
+    static HardwareLink hwLink = new HardwareLink();
     static GUIPHATInterface phat;
 
     PHATPresenceSensor presence;
@@ -59,15 +60,6 @@ public class PhatHardwareLink implements PHATInitializer, PHATCommandListener, S
     String bodyId = "Patient";
     String houseId = "House1";
     JFrame sensorMonitor;
-
-    int mqttQos = 2;
-    static String mqttPort = "1986";
-    static String mqttBroker = "tcp://localhost:" + mqttPort;
-    static String mqttClientId = "PhatHardwareLink";
-    static String mqttTopic = "presence";
-    static MemoryPersistence mqttPersistence = new MemoryPersistence();
-    static MqttClient mqttClient;
-    static MqttConnectOptions connOpts;
 
     //Stores previous sensor state to avoid duplicating messages
     //It's init at true so sim doesn't trigger the warning on start
@@ -78,7 +70,7 @@ public class PhatHardwareLink implements PHATInitializer, PHATCommandListener, S
 
     public static void main(String[] args) throws IOException {
         //String[] a = {"-record"};
-        PhatHardwareLink sim = new PhatHardwareLink();
+        PhatPresenceSensor sim = new PhatPresenceSensor();
         phat = new GUIPHATInterface(sim);//, new GUIArgumentProcessor());
         phat.setStatView(true);
         phat.setDisplayFPS(true);
@@ -90,25 +82,9 @@ public class PhatHardwareLink implements PHATInitializer, PHATCommandListener, S
         //Hide prettyLogger from GUI
         phat.hidePrettyLogger();
 
-        //Start MQTT server
-        try {
-            broker.startServer(mqttPort);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        //Start link to hardware
+        hwLink.startHardwareLink();
 
-        startMQTTclient();
-    }
-
-    public static void startMQTTclient() {
-        try {
-            mqttClient = new MqttClient(mqttBroker, mqttClientId, mqttPersistence);
-            connOpts = new MqttConnectOptions();
-            connOpts.setCleanSession(true);
-
-        } catch(MqttException me) {
-            handleMQTTexception(me);
-        }
     }
 
     @Override
@@ -241,57 +217,19 @@ public class PhatHardwareLink implements PHATInitializer, PHATCommandListener, S
         }
     }
 
-    private void sendMQTTmessage(String msg) {
-        try {
-            //System.out.println("Connecting to broker: "+mqttBroker);
-            mqttClient.connect(connOpts);
-            //System.out.println("Connected");
-            //System.out.println("Publishing message: "+msg);
-            MqttMessage message = new MqttMessage(msg.getBytes(StandardCharsets.UTF_8));
-            message.setQos(mqttQos);
-            mqttClient.publish(mqttTopic, message);
-            //System.out.println("Message published");
-            mqttClient.disconnect();
-            //System.out.println("Disconnected");
-        } catch(MqttException me) {
-            handleMQTTexception(me);
-        }
-    }
-
-    private static void handleMQTTexception(MqttException me) {
-        System.out.println("reason "+me.getReasonCode());
-        System.out.println("msg "+me.getMessage());
-        System.out.println("loc "+me.getLocalizedMessage());
-        System.out.println("cause "+me.getCause());
-        System.out.println("excep "+me);
-        me.printStackTrace();
-    }
-
     @Override
     public void update(Sensor sensor, SensorData sensorData) {
         PHATPresenceSensor ps = (PHATPresenceSensor)sensor;
         PresenceData pd = ps.getPresenceData();
         //If presence detected, coming from a false state and cooldown time passed
         if (pd.isPresence() && !lastPresenceState && (pd.getTimestamp() - lastPresenceTimestamp > SENSORTIMEOUT)) {
-            sendMQTTmessage("Presence detected!");
+            hwLink.warnHardware("Presence detected!");
             lastPresenceState = true;
             lastPresenceTimestamp = pd.getTimestamp();
         } else if (!pd.isPresence()) {
             lastPresenceState = false;
             lastPresenceTimestamp = pd.getTimestamp();
         }
-        //System.out.println(ps.getPresenceData().getTimestamp());
-        //System.out.println(phat.getSimTime().getTimeInMillis());
-        /*System.out.println("---------------");
-        System.out.println("Sensor updated");
-        sendMQTTmessage("Sensor updated");
-        System.out.println(sensor.getId());
-        System.out.println(sensor.getSpatial());
-        System.out.println(sensor.getClass());
-        PresenceData pd = ps.getPresenceData();
-        System.out.println(pd.isPresence());
-        System.out.println(pd.getTimestamp());
-        System.out.println(phat.deviceConfig.getDevicesAppState().getDevice("PreSen-Bedroom1-1").getControl(PHATPresenceSensor.class).getPresenceData());*/
     }
 
     @Override
