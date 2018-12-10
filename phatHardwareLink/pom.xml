@@ -83,6 +83,11 @@
       <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
       <version>1.2.0</version>
     </dependency>
+    <dependency>
+      <groupId>io.moquette</groupId>
+      <artifactId>moquette-broker</artifactId>
+      <version>0.11</version>
+    </dependency>
     <!--<dependency>
       <groupId>net.sf.jali</groupId>
       <artifactId>jali-adm</artifactId>
@@ -224,6 +229,16 @@
     <repository>
       <id>Eclipse Paho Repo</id>
       <url>https://repo.eclipse.org/content/repositories/paho-releases/&gt;</url>
+    </repository>
+    <repository>
+      <id>bintray</id>
+      <url>https://jcenter.bintray.com</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
     </repository>
   </repositories>
 </project>

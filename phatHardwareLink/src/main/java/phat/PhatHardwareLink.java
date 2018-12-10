@@ -1,5 +1,6 @@
 package phat;
 
+import java.io.IOException;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import javax.swing.JFrame;
@@ -16,7 +17,6 @@ import phat.agents.commands.ActivateActuatorEventsLauncherCommand;
 import phat.agents.commands.ActivateCallStateEventsLauncherCommand;
 import phat.body.BodiesAppState;
 import phat.body.commands.*;
-import phat.client.sensor.presence.PHATPresenceData;
 import phat.commands.PHATCommand;
 import phat.commands.PHATCommandListener;
 import phat.config.AgentConfigurator;
@@ -44,11 +44,14 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import java.nio.charset.StandardCharsets;
 
+//import phat.MqttBroker;
+
 /**
  * Phat Hardware Link
  * @author melkoroth
  */
 public class PhatHardwareLink implements PHATInitializer, PHATCommandListener, SensorListener {
+    static MqttBroker broker = new MqttBroker();
     static GUIPHATInterface phat;
 
     PHATPresenceSensor presence;
@@ -57,10 +60,11 @@ public class PhatHardwareLink implements PHATInitializer, PHATCommandListener, S
     String houseId = "House1";
     JFrame sensorMonitor;
 
-    String mqttTopic = "presence";
     int mqttQos = 2;
-    static String mqttBroker = "tcp://localhost:1986";
+    static String mqttPort = "1986";
+    static String mqttBroker = "tcp://localhost:" + mqttPort;
     static String mqttClientId = "PhatHardwareLink";
+    static String mqttTopic = "presence";
     static MemoryPersistence mqttPersistence = new MemoryPersistence();
     static MqttClient mqttClient;
     static MqttConnectOptions connOpts;
@@ -72,7 +76,7 @@ public class PhatHardwareLink implements PHATInitializer, PHATCommandListener, S
     static final long SENSORTIMEOUT = 5000;
     long lastPresenceTimestamp;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         //String[] a = {"-record"};
         PhatHardwareLink sim = new PhatHardwareLink();
         phat = new GUIPHATInterface(sim);//, new GUIArgumentProcessor());
@@ -85,6 +89,13 @@ public class PhatHardwareLink implements PHATInitializer, PHATCommandListener, S
         phat.start();
         //Hide prettyLogger from GUI
         phat.hidePrettyLogger();
+
+        //Start MQTT server
+        try {
+            broker.startServer(mqttPort);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         startMQTTclient();
     }
