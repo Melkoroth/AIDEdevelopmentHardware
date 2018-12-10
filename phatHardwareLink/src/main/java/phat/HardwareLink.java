@@ -6,22 +6,30 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+import com.fazecast.jSerialComm.*;
+
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 public class HardwareLink {
 
-    static MqttBroker broker = new MqttBroker();
+    //MQTT variables
+    private static MqttBroker broker = new MqttBroker();
+    private int mqttQos = 2;
+    private static String mqttPort = "1986";
+    private static String mqttBroker = "tcp://localhost:" + mqttPort;
+    private static String mqttClientId = "PhatHardwareLink";
+    private static String mqttTopic = "presence";
+    private static MemoryPersistence mqttPersistence = new MemoryPersistence();
+    private static MqttClient mqttClient;
+    private static MqttConnectOptions connOpts;
 
-    //MQTT settings
-    int mqttQos = 2;
-    static String mqttPort = "1986";
-    static String mqttBroker = "tcp://localhost:" + mqttPort;
-    static String mqttClientId = "PhatHardwareLink";
-    static String mqttTopic = "presence";
-    static MemoryPersistence mqttPersistence = new MemoryPersistence();
-    static MqttClient mqttClient;
-    static MqttConnectOptions connOpts;
+    //Serial variables
+    private static SerialPort circuitPlayground;
+    private static String cpName = "Circuit Playground Expresso";
+    private static String triggerAlarmMessage = "a";
+    private static String deactivateAlarmMessage = "d";
 
     //TODO: Add Serial
     public static void startHardwareLink() {
@@ -31,7 +39,6 @@ public class HardwareLink {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         //Start MQTT client
         try {
             mqttClient = new MqttClient(mqttBroker, mqttClientId, mqttPersistence);
@@ -40,6 +47,25 @@ public class HardwareLink {
 
         } catch(MqttException me) {
             handleMQTTexception(me);
+        }
+        //Start serial port
+        SerialPort ports[] = SerialPort.getCommPorts();
+        for (int i = 0; i < ports.length; i++) {
+            if (ports[i].toString().equalsIgnoreCase(cpName)) {
+                circuitPlayground = SerialPort.getCommPort("/dev/" + ports[i].getSystemPortName());
+            }
+
+            circuitPlayground.openPort();
+            System.out.println(circuitPlayground.getBaudRate());
+            //TODO:
+            //Whatr if Circuit python is not connected??
+            /*triggerAlarm();
+            try {
+                TimeUnit.SECONDS.sleep(5);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            deactivateAlarm();*/
         }
     }
 
