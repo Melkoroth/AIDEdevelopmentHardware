@@ -53,6 +53,8 @@ const uint8_t spUP[] PROGMEM = {0x69,0x2C,0x6A,0x32,0xCC,0x97,0xAC,0xA1,0xC8,0x4
 uint32_t lastTouchMillis = 0;
 boolean leftToggle = false;
 boolean rightToggle = false;
+//Stores info on alarm
+boolean alarmTriggered = false;
 
 // *********************************************
 // SETUP
@@ -84,10 +86,11 @@ void setup() {
 // *********************************************
 void loop() {
     uint32_t millisNow = millis();
-    checkButtons(millisNow);
+    //checkButtons(millisNow);
+    checkSerial();
 
     //Check for left button press and enable/disable light
-    if (leftToggle) {
+    if (alarmTriggered) {
         showLitFlicker(millisNow);
     } else {
         CircuitPlayground.strip.clear();
@@ -103,6 +106,38 @@ void loop() {
     }
 }
 
+void checkSerial() {
+  if (Serial.available()) {
+    char inChar = Serial.read();
+    if (inChar == 'a' || inChar == 'A') {
+      triggerAlarm();
+    } else if (inChar == 'd' || inChar == 'D') {
+      deactivateAlarm();
+    }
+    //Clear buffer
+    while (Serial.available()) {
+      Serial.read();
+    }
+  }
+}
+
+void triggerAlarm() {
+  /*CircuitPlayground.speaker.say(spEMERGENCY);
+  delay(25);
+  CircuitPlayground.speaker.say(spJULIET);
+  delay(25);
+  CircuitPlayground.speaker.say(spIS);
+  delay(25);
+  CircuitPlayground.speaker.say(spUP);
+  delay(25);
+  CircuitPlayground.speaker.say(spEMERGENCY);*/
+  alarmTriggered = true;
+}
+
+void deactivateAlarm() {
+  alarmTriggered = false;
+}
+
 //Check button presses
 void checkButtons(uint32_t millisNow) {
     if (millisNow - lastTouchMillis > 250) {
@@ -114,15 +149,7 @@ void checkButtons(uint32_t millisNow) {
         }
         if (CircuitPlayground.rightButton()) {
             Serial.println("Right button pressed!");
-            CircuitPlayground.speaker.say(spEMERGENCY);
-            delay(25);
-            CircuitPlayground.speaker.say(spJULIET);
-            delay(25);
-            CircuitPlayground.speaker.say(spIS);
-            delay(25);
-            CircuitPlayground.speaker.say(spUP);
-            delay(25);
-            CircuitPlayground.speaker.say(spEMERGENCY);
+
             rightToggle = !rightToggle;
         }
     } 

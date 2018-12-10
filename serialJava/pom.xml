@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>aide.hardware</groupId>
+  <artifactId>serialJava</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0.0-SNAPSHOT</version>
+  <name>AIDE Serial Test</name>
+  <description>Serial Test for AIDE Hardware project</description>
+  <url>https://github.com/Melkoroth/AIDEdevelopmentHardware</url>
+
+  <licenses>
+    <license>
+      <name>The GPL V3</name>
+      <url>http://www.gnu.org/copyleft/gpl.html</url>
+      <distribution />
+    </license>
+  </licenses>
+
+  <scm>
+    <connection>
+      scm:git:git://github.com/Melkoroth/AIDEdevelopmentHardware.git
+    </connection>
+    <developerConnection>
+      scm:git:git@github.com:Melkoroth/AIDEdevelopmentHardware.git
+    </developerConnection>
+    <url>https://github.com/Melkoroth/AIDEdevelopmentHardware</url>
+  </scm>
+
+  <developers>
+    <developer>
+      <id>Melkoroth</id>
+      <name>Juan L. Perez</name>
+      <email>jlpdiez@ucm.es</email>
+    </developer>
+  </developers>
+
+  <properties>
+    <vendor>GRASIA Research Group</vendor>
+    <developername>Juan Luis Perez Diez</developername>
+    <developeremail>jlpdiez@ucm.es</developeremail>
+  </properties>
+
+   <dependencies>
+    <dependency>
+       <groupId>com.fazecast</groupId>
+       <artifactId>jSerialComm</artifactId>
+       <version>[2.0.0,3.0.0)</version>
+    </dependency>
+  </dependencies> 
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.github.ferstl</groupId>
+        <artifactId>depgraph-maven-plugin</artifactId>
+        <version>3.0.1</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.0</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+          <optimize>true</optimize>
+          <showDeprecations>true</showDeprecations>
+          <encoding>ISO-8859-1</encoding>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.2</version>
+      </plugin>
+    </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <versionRange>[1.0.0,)</versionRange>
+                    <goals>
+                      <goal>build-classpath</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore/>
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <repositories>
+    <repository>
+      <id>java.net-m2</id>
+      <name>java.net - Maven 2</name>
+      <url>https://repository.jboss.org/nexus/content/repositories/java.net-m2</url>
+    </repository>
+    <repository>
+      <id>sonatype-public</id>
+      <name>sonatype public</name>
+      <url>https://oss.sonatype.org/content/groups/public/</url>
+    </repository>
+    <!-- <repository>
+        <id>Eclipse Paho Repo</id>
+        <url>https://repo.eclipse.org/content/repositories/paho-releases/></url>
+    </repository>
+    <repository>
+        <id>bintray</id>
+        <url>https://jcenter.bintray.com</url>
+        <releases>
+          <enabled>true</enabled>
+        </releases>
+        <snapshots>
+          <enabled>false</enabled>
+        </snapshots>
+    </repository> -->
+  </repositories>
+
+</project>

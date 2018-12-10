@@ -11,8 +11,8 @@
   <artifactId>PhatHardwareLink</artifactId>
   <packaging>jar</packaging>
   <version>1.0.0-SNAPSHOT</version>
-  <name>AIDE Hardware PHAT Link</name>
-  <description>Serves as a MQTT link between PHAT and hardware</description>
+  <name>AIDE Hardware PHAT/BeagleBone Link</name>
+  <description>Serves as a link between PHAT virtual sensor / real beaglebone sensor and hardware</description>
   <url>https://github.com/Melkoroth/AIDEdevelopmentHardware</url>
 
   <licenses>

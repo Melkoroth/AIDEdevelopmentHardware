@@ -18,13 +18,15 @@ This is the main JAVA project and the brain of the system. It consists of two ma
 
 Both perform the same duties of managing a presence sensor. The difference is that in PHATSim the sensor is virtual whereas in the BeagleBone a real presence sensor is used.
 
-For this, both call the same methods that init the MQTT broker and client which is used to communicate with the ESP8266 and the Serial which is used to communicate with the Circuit Playground Express. 
-
-## espHardware
+For this, both call the same methods that init the MQTT broker and client which is used to communicate with the ESP8266 and the Serial which is used to communicate with the Circuit Playground Express.
 
 ## circuitPlaygroundHardware
+This is a C++ project developed using Platformio framework for the Adafruit Hardware. 
+The hardware keeps waiting for a serial character:
+* If 'a' is received the Hardware will enter alarm mode. It will speak out loud and it will begin to light in red-orange.
+* If 'd' is received the hardware will enter normal waiting mode.
 
-
+## espHardware
 
 ---DEPRECATED---
 
@@ -60,6 +62,8 @@ Please refer to the "Getting Started" section of [AIDEdevelopment's README](http
 [![OpenJDK Version](https://img.shields.io/badge/openjdk-v1.8-red.svg)](http://openjdk.java.net/)
 [![Maven Version](https://img.shields.io/badge/maven-v3.1.1-orange.svg)](http://maven.apache.org/)
 
+This is an example of usage of the MQTT JAVA library.
+
 If you need help installing the neccesary JAVA stuff, please refer to [PHATSIM's Readme](https://github.com/Grasia/phatsim) 
 
 To send a test message from JAVA:
@@ -70,12 +74,18 @@ mvn exec:java -Dexec.mainClass=aide.harware.mqttTest.MqttPublishSample
 ```
 You should see message info in mosquitto's screen and in serial monitor.
 
+## mqttJava - MqttPublishSample
+[![OpenJDK Version](https://img.shields.io/badge/openjdk-v1.8-red.svg)](http://openjdk.java.net/)
+[![Maven Version](https://img.shields.io/badge/maven-v3.1.1-orange.svg)](http://maven.apache.org/)
+
+This is an example of usage of the MQTT Broker JAVA library.
+
 ## basePhatSim 
 [![OpenJDK Version](https://img.shields.io/badge/openjdk-v1.8-red.svg)](http://openjdk.java.net/)
 [![Maven Version](https://img.shields.io/badge/maven-v3.1.1-orange.svg)](http://maven.apache.org/)
 [![Ant Version](https://img.shields.io/badge/ant-v1.8.2-yellow.svg)](http://ant.apache.org/)
 
-This example, developed using [SociAALML Editor](https://github.com/Grasia/sociaalml), is used as the base simulation in which the presence detector and rest of the development will be added.
+This example, developed using [SociAALML Editor](https://github.com/Grasia/sociaalml), was used as an example in which the presence detector and rest of the development will be added. From this main experiments were done.
 
 To run the editor:
 ```bash
