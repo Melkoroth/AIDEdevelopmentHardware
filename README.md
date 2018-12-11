@@ -38,7 +38,7 @@ The important methods this class has are these:
 [![Platformio Version](https://img.shields.io/badge/platformio-3.6.2-orange.svg)](https://platformio.org/)
 [![Platform](https://img.shields.io/badge/platform-Atmel%20SAM-yellow.svg)](https://platformio.org/platforms/atmelsam)
 
-This is a C++ project developed using Platformio framework for the Adafruit Hardware. 
+This is a C++ project developed using Platformio framework for the Adafruit Hardware. No external hardware is used in this example, just the included sensors in the PCB.
 
 Internally the hardware keeps waiting for the serial character 'a' which means that the alarm has been triggered.
 When the alarm is triggered it will flash lights, speak out loud and wait for the caregiver to acknowledge the warning with the press of any button. Once the user has acknowledged the message a 'b' is returned through serial.
@@ -48,9 +48,11 @@ When the alarm is triggered it will flash lights, speak out loud and wait for th
 [![Platformio Version](https://img.shields.io/badge/platformio-3.6.2-orange.svg)](https://platformio.org/)
 [![Platform](https://img.shields.io/badge/platform-ESP8266-yellow.svg)](https://platformio.org/platforms/espressif8266)
 
-This is a C++ project developed using Platformio framework for the Espresiff's ESP8266 hardware.
+This is a C++ project developed using Platformio framework for the Espresiff's ESP8266 hardware. The other hardware required is a [Seeedstudio OLED screen](http://wiki.seeedstudio.com/Grove-OLED_Display_1.12inch/) and a LED.
 
-Internally the hardware keeps waiting for a MQTT message sent through the *presence* topic. Once this message arrives the OLED screen displays a big warning sign and the received message.  
+Internally the hardware keeps waiting for a MQTT message sent through the *presence* topic. Once this message arrives the OLED screen displays a big warning sign with the received message and a LED is switched on.
+
+This is a wifi-enabled device so you should check ssid & password settings in the .ino.
 
 ## **---DEPRECATED---**
 
@@ -78,6 +80,12 @@ mosquitto_pub -h localhost -t "anyTopic" -m "message"
 ## Topics used
 *  Hardware subscribes to *alertTopic*
 *  Software subscribes to *alertButtonTopic*
+
+## Hardware libraries are included as git submodules
+```bash
+git submodule init
+git submodule update
+```
 
 ## JAVA, Maven and ANT install
 Please refer to the "Getting Started" section of [AIDEdevelopment's README](https://github.com/Melkoroth/AIDEdevelopment/blob/master/README.md)

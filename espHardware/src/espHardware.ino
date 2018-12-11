@@ -25,6 +25,15 @@ const uint8_t SCLPIN = 5;
 //I2C Addresses
 uint8_t OLEDADDRESS = 0x3C;
 
+//Wifi stuff
+const uint32_t CONNECTTIMEOUT = 30000;
+const char* ssid = "pruebas";
+const char* password = "cfbefe695318db2120e8";
+const char* mqttServer = "192.168.1.34";
+const uint16_t mqttPort = 1986;
+const char* mqttSubTopic = "presence";
+WiFiClient wifiClient;
+
 //Control if HW outputs to serial or not
 //Declare as empty to disable output
 #define Sprintln(x) (Serial.println(x))
@@ -108,15 +117,6 @@ static const unsigned char alert96 [] PROGMEM = {
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
-
-//Wifi stuff
-const uint32_t CONNECTTIMEOUT = 30000;
-const char* ssid = "pruebas";
-const char* password = "cfbefe695318db2120e8";
-const char* mqttServer = "192.168.1.33";
-const uint16_t mqttPort = 1986;
-const char* mqttSubTopic = "alertTopic";
-WiFiClient wifiClient;
 
 //MQTT vars
 const uint8_t MAXMSGLEN = 50;
@@ -303,11 +303,11 @@ void mqttReconnect() {
         SeeedGrayOled.setTextXY(4, 0);
         SeeedGrayOled.putString("MQTT Fail...");
         SeeedGrayOled.setTextXY(5, 0);
-        SeeedGrayOled.putString("retry in 5s");
+        SeeedGrayOled.putString("retry in 1s");
         Sprint(mqttClient.state());
-        Sprintln(" try again in 5 seconds");
+        Sprintln(" try again in 1 seconds");
         // Wait 5 seconds before retrying
-        delay(5000);
+        delay(1000);
     }
   }
 }

@@ -44,9 +44,15 @@ public class HardwareLink implements Runnable {
     private boolean serialOpened = false;
 
     //Logic variables
-    private final long USERREACTIONTIMESECONDS = 5;
-    private boolean alarmTriggered = false;
+    //Time the caregiver has to react to the hardware warning
+    private final long USERREACTIONTIMESECONDS = 10;
+    //Set to true externally. inits chain of events
+    private boolean alarmTriggeredPrimary = false;
+    //Keeps track of MQTT warning to not repeat reiggers
+    private boolean alarmTriggeredSecondary = false;
+    //Keeps track of when the system is servicing the warning
     private boolean alarmServiced = false;
+    //Used for checking button press
     private boolean alarmDeactivated = false;
     private long lastPresenceTimestamp = 0;
 
@@ -57,24 +63,25 @@ public class HardwareLink implements Runnable {
     public void run() {
         while(true) {
             //Chain of events starts when alarmTriggered
-            if (alarmTriggered && !alarmServiced) {
+            if (alarmTriggeredPrimary && !alarmServiced) {
                 lastPresenceTimestamp = System.currentTimeMillis() / 1000L;
                 alarmServiced = true;
                 alarmDeactivated = false;
+                alarmTriggeredSecondary = false;
                 triggerSerialAlarm();
-                System.out.println("Alarm Triggered!");
             }
 
             //Alarm has been triggered and serviced so we check if time has passed to warn external agent
-            //TODO: Protect against multiple calls!
-            if (alarmTriggered && alarmServiced && !alarmDeactivated
+            if (alarmTriggeredPrimary && !alarmTriggeredSecondary && alarmServiced && !alarmDeactivated
                     && (((System.currentTimeMillis() / 1000L) - lastPresenceTimestamp) > USERREACTIONTIMESECONDS)) {
                 sendMQTTmessage(mqttMessage);
+                alarmTriggeredSecondary = true;
             }
 
             //Caregiver has responded to call. No need to warn external agent
             if (alarmDeactivated) {
-                alarmTriggered = false;
+                alarmTriggeredPrimary = false;
+                alarmTriggeredSecondary = false;
                 alarmServiced = false;
                 alarmDeactivated = false;
                 lastPresenceTimestamp = 0;
@@ -101,6 +108,34 @@ public class HardwareLink implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        /*
+            static MqttClientPersistence s_dataStore;
+            static MqttClientPersistence s_pubDataStore;
+            static Server m_server;
+
+            protected static void startServer(String port) throws IOException {
+                System.out.println("Starting broker server");
+                String tmpDir = System.getProperty("java.io.tmpdir");
+                s_dataStore = new MqttDefaultFilePersistence(tmpDir);
+                s_pubDataStore = new MqttDefaultFilePersistence(tmpDir + File.separator + "publisher");
+
+                Properties m_properties = new Properties();
+                m_properties.put(PERSISTENT_STORE_PROPERTY_NAME, s_pubDataStore);
+                m_properties.put(BrokerConstants.PORT_PROPERTY_NAME, port);
+                // m_properties.put(BrokerConstants.PORT_PROPERTY_NAME, Integer.toString(BrokerConstants.PORT));
+                // m_properties.put(BrokerConstants.HOST_PROPERTY_NAME, BrokerConstants.HOST);
+                // m_properties.put(BrokerConstants.WEB_SOCKET_PORT_PROPERTY_NAME,
+                // Integer.toString(BrokerConstants.WEBSOCKET_PORT));
+                // m_properties.put(BrokerConstants.PASSWORD_FILE_PROPERTY_NAME, "");
+                //m_properties.put(BrokerConstants.PERSISTENT_STORE_PROPERTY_NAME,
+                //BrokerConstants.DEFAULT_PERSISTENT_PATH);
+                m_properties.put(BrokerConstants.ALLOW_ANONYMOUS_PROPERTY_NAME, true);
+                // m_properties.put(BrokerConstants.AUTHENTICATOR_CLASS_NAME, "");
+                // m_properties.put(BrokerConstants.AUTHORIZATOR_CLASS_NAME, "");
+
+                m_server = new Server();
+                m_server.startServer(m_properties);*/
 
         //Start MQTT client
         try {
@@ -148,11 +183,11 @@ public class HardwareLink implements Runnable {
 
     //Triggers flag to make run() trigger hardware
     public void initWarnSequence() {
-        alarmTriggered = true;
+        alarmTriggeredPrimary = true;
     }
 
     public void stopWarnSequence() {
-        alarmTriggered = false;
+        alarmTriggeredPrimary = false;
     }
 
     private void triggerSerialAlarm() {
