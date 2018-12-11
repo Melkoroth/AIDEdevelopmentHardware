@@ -86,10 +86,10 @@ void setup() {
 // *********************************************
 void loop() {
     uint32_t millisNow = millis();
-    //checkButtons(millisNow);
+    checkButtons(millisNow);
     checkSerial();
 
-    //Check for left button press and enable/disable light
+    //Alarm is triggered through serial and processed here
     if (alarmTriggered) {
         showLitFlicker(millisNow);
     } else {
@@ -97,15 +97,16 @@ void loop() {
         CircuitPlayground.strip.show();
     }
 
-    //Check for right button press
-    if (rightToggle) {
-        //showLitFlicker(millisNow);
-    } else {
-        //CircuitPlayground.strip.clear();
-        //CircuitPlayground.strip.show();
+    //If button is pressed then we deactivate the alarm and inform
+    if ((rightToggle || leftToggle) && alarmTriggered) {
+      alarmTriggered = false;
+      Serial.print("b");
+      leftToggle = false;
+      rightToggle = false;
     }
 }
 
+//Checks serial for "a" to activate alarm or "d" to deactivate
 void checkSerial() {
   if (Serial.available()) {
     char inChar = Serial.read();
@@ -142,15 +143,13 @@ void deactivateAlarm() {
 void checkButtons(uint32_t millisNow) {
     if (millisNow - lastTouchMillis > 250) {
         lastTouchMillis = millisNow;
-        
         if (CircuitPlayground.leftButton()) {
-            Serial.println("Left button pressed!");
-            leftToggle = !leftToggle;
+            //Serial.println("Left button pressed!");
+            leftToggle = true;
         }
         if (CircuitPlayground.rightButton()) {
-            Serial.println("Right button pressed!");
-
-            rightToggle = !rightToggle;
+            //Serial.println("Right button pressed!");
+            rightToggle = true;
         }
     } 
 }

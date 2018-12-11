@@ -37,7 +37,6 @@ import phat.server.commands.CreateAllPresenceSensorServersCommand;
 import phat.structures.houses.HouseFactory;
 import phat.world.WorldAppState;
 
-import phat.MqttBroker;
 import phat.HardwareLink;
 
 /**
@@ -186,7 +185,7 @@ public class PhatPresenceSensor implements PHATInitializer, PHATCommandListener,
         return "This is a proof of concept simulation with a presence sensor attached which warns HW";
     }
 
-    //Updates GUI for presence sensor
+   //Called at init
     @Override
     public void commandStateChanged(PHATCommand command) {
         System.out.println("commandStateChanged");
@@ -210,13 +209,14 @@ public class PhatPresenceSensor implements PHATInitializer, PHATCommandListener,
         }
     }
 
+    //Called every time the sensor triggers
     @Override
     public void update(Sensor sensor, SensorData sensorData) {
         PHATPresenceSensor ps = (PHATPresenceSensor)sensor;
         PresenceData pd = ps.getPresenceData();
         //If presence detected, coming from a false state and cooldown time passed
         if (pd.isPresence() && !lastPresenceState && (pd.getTimestamp() - lastPresenceTimestamp > SENSORTIMEOUT)) {
-            hwLink.warnHardware("Presence detected!");
+            hwLink.initWarnSequence();
             lastPresenceState = true;
             lastPresenceTimestamp = pd.getTimestamp();
         } else if (!pd.isPresence()) {

@@ -8,12 +8,15 @@ This project stems from [AIDE for People with Neurodegenerative Diseases](http:/
 As it is a derived project which uses [PHATSIM](https://github.com/Grasia/phatsim) we can test the developed hardware in the simulator before implementing it in real-life. For communication between the simulation framework and real hardware MQTT was chosen.
 
 ## Projected Cases
-Case 1: PHATSIM's virtual motion detector -> Hardware
-Case 2: Real world motion detector -> Hardware
+1. PHATSIM's virtual motion detector -> Hardware
+2. Real world motion detector -> Hardware
 
 The important project folders follow:
 
 ## phatHardwareLink
+[![OpenJDK Version](https://img.shields.io/badge/openjdk-v1.8-red.svg)](http://openjdk.java.net/)
+[![Maven Version](https://img.shields.io/badge/maven-v3.1.1-orange.svg)](http://maven.apache.org/)
+
 This is the main JAVA project and the brain of the system. It consists of two main classes: **PhatPresenceSensor** and **BeaglePresenceSensor**
 
 Both perform the same duties of managing a presence sensor. The difference is that in PHATSim the sensor is virtual whereas in the BeagleBone a real presence sensor is used.
@@ -21,12 +24,19 @@ Both perform the same duties of managing a presence sensor. The difference is th
 For this, both call the same methods that init the MQTT broker and client which is used to communicate with the ESP8266 and the Serial which is used to communicate with the Circuit Playground Express.
 
 ## circuitPlaygroundHardware
+[![C++ Arduino](https://img.shields.io/badge/c%2B%2B-Arduino%20-red.svg)](https://github.com/adafruit/Adafruit_CircuitPlayground)
+[![Platformio Version](https://img.shields.io/badge/platformio-3.6.2-orange.svg)](https://platformio.org/)
+[![Platform](https://img.shields.io/badge/platform-Atmel%20SAM-yellow.svg)](https://platformio.org/platforms/atmelsam)
+
 This is a C++ project developed using Platformio framework for the Adafruit Hardware. 
 The hardware keeps waiting for a serial character:
 * If 'a' is received the Hardware will enter alarm mode. It will speak out loud and it will begin to light in red-orange.
 * If 'd' is received the hardware will enter normal waiting mode.
 
 ## espHardware
+[![C++ Arduino](https://img.shields.io/badge/c%2B%2B-Arduino%20-red.svg)](https://github.com/adafruit/Adafruit_CircuitPlayground)
+[![Platformio Version](https://img.shields.io/badge/platformio-3.6.2-orange.svg)](https://platformio.org/)
+[![Platform](https://img.shields.io/badge/platform-ESP8266-yellow.svg)](https://platformio.org/platforms/espressif8266)
 
 ---DEPRECATED---
 
