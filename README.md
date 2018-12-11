@@ -3,25 +3,35 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/f610aeff73444cc1a1192f05cad7a57e)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Melkoroth/AIDEdevelopmentHardware&amp;utm_campaign=Badge_Grade)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-This project stems from [AIDE for People with Neurodegenerative Diseases](http://grasiagroup.fdi.ucm.es/aidendd/) and tries to solve some problems the patients have by the use of custom-made hardware.
+This project stems from [AIDE for People with Neurodegenerative Diseases](http://grasiagroup.fdi.ucm.es/aidendd/) and tries to solve a problem the patients have by the use of custom-made hardware. 
+The problem revolves around the idea that these kind of patients often get lost or fall when waking up at night to go to the bathroom. This has serious implications for them and for the caregiver, which has to be aware of any movements the patient performs at night so they can help them. This often results in lack of proper sleep for the caregivers.
 
-As it is a derived project which uses [PHATSIM](https://github.com/Grasia/phatsim) we can test the developed hardware in the simulator before implementing it in real-life. For communication between the simulation framework and real hardware MQTT was chosen.
+The proposed solution is simple but effective. It consists of three devices: a presence sensor installed in the patient's room, a warning receiver for the caregiver which has the task of waking her/him up and another warning receiver that should be given to an outside party for redundancy.
 
-## Projected Cases
-1. PHATSIM's virtual motion detector -> Hardware
-2. Real world motion detector -> Hardware
+As it is a derived project which uses [PHATSIM](https://github.com/Grasia/phatsim) we can test the developed hardware in the simulator before implementing it in real-life.
 
-The important project folders follow:
+## Projected Experiments
+1. Usage with PHATSIM's *virtual* motion detector.
+2. Usage with a *real world* motion detector.
+
+## System's chain of events
+1. Presence is detected. This means that the patient has woken up at night and that the caregiver must be warned in order to help her/him.
+2. Circuit Python receives the warning. This hardware lights up in red/orange and speaks out lout "Emergency, Juliet is up, emergency".
+3. The system waits now for the caregiver to acknowledge the warning by the press of a button.
+4. If the time passes by and the system doesn't detect the caregiver's interaction it will alert the secondary device, the ESP8266. This device can rest in an external location so we get redundancy in case of an emergency.
 
 ## phatHardwareLink
 [![OpenJDK Version](https://img.shields.io/badge/openjdk-v1.8-red.svg)](http://openjdk.java.net/)
 [![Maven Version](https://img.shields.io/badge/maven-v3.1.1-orange.svg)](http://maven.apache.org/)
 
-This is the main JAVA project and the brain of the system. It consists of two main classes: **PhatPresenceSensor** and **BeaglePresenceSensor**
+This is the main JAVA project and the *brain* of the system. It consists of two main classes: **PhatPresenceSensor** and **BeaglePresenceSensor**. Each one of them cover one of the proposed experiments.
 
 Both perform the same duties of managing a presence sensor. The difference is that in PHATSim the sensor is virtual whereas in the BeagleBone a real presence sensor is used.
 
-For this, both call the same methods that init the MQTT broker and client which is used to communicate with the ESP8266 and the Serial which is used to communicate with the Circuit Playground Express.
+For this, both call the same methods that init the **HardwareLink** which is used to communicate with the caregiver's hardware when the presence is detected.
+The important methods this class has are these:
+* startHardwareLink() inits class, MQTT broker, client and serial interfaces.
+* initWarnSequence() is called when movement in the room is detected
 
 ## circuitPlaygroundHardware
 [![C++ Arduino](https://img.shields.io/badge/c%2B%2B-Arduino%20-red.svg)](https://github.com/adafruit/Adafruit_CircuitPlayground)
@@ -29,16 +39,20 @@ For this, both call the same methods that init the MQTT broker and client which 
 [![Platform](https://img.shields.io/badge/platform-Atmel%20SAM-yellow.svg)](https://platformio.org/platforms/atmelsam)
 
 This is a C++ project developed using Platformio framework for the Adafruit Hardware. 
-The hardware keeps waiting for a serial character:
-* If 'a' is received the Hardware will enter alarm mode. It will speak out loud and it will begin to light in red-orange.
-* If 'd' is received the hardware will enter normal waiting mode.
+
+Internally the hardware keeps waiting for the serial character 'a' which means that the alarm has been triggered.
+When the alarm is triggered it will flash lights, speak out loud and wait for the caregiver to acknowledge the warning with the press of any button. Once the user has acknowledged the message a 'b' is returned through serial.
 
 ## espHardware
 [![C++ Arduino](https://img.shields.io/badge/c%2B%2B-Arduino%20-red.svg)](https://github.com/adafruit/Adafruit_CircuitPlayground)
 [![Platformio Version](https://img.shields.io/badge/platformio-3.6.2-orange.svg)](https://platformio.org/)
 [![Platform](https://img.shields.io/badge/platform-ESP8266-yellow.svg)](https://platformio.org/platforms/espressif8266)
 
----DEPRECATED---
+This is a C++ project developed using Platformio framework for the Espresiff's ESP8266 hardware.
+
+Internally the hardware keeps waiting for a MQTT message sent through the *presence* topic. Once this message arrives the OLED screen displays a big warning sign and the received message.  
+
+## **---DEPRECATED---**
 
 ## Using the MQTT broker
 MQTT needs a server installed to be used as a MQTT broker. You can use Ubuntu's included one, mosquitto, or an external provider just by changing IP address and port inside the code.

@@ -17,6 +17,7 @@ import com.fazecast.jSerialComm.*;
 
 /**
  * Hardware Link
+ * Server as the intermediator between the presence sensors and the caregiver's hardware
  * @author melkoroth
  */
 public class HardwareLink implements Runnable {
@@ -50,6 +51,8 @@ public class HardwareLink implements Runnable {
     private long lastPresenceTimestamp = 0;
 
     //Thread that handles HW triggering
+    //Triggers CircuitPlayground HW and waits for button press
+    //If no button is pressed a MQTT message is sent to ESP8266
     @Override
     public void run() {
         while(true) {
@@ -59,7 +62,6 @@ public class HardwareLink implements Runnable {
                 alarmServiced = true;
                 alarmDeactivated = false;
                 triggerSerialAlarm();
-                //sendMQTTmessage("Presence detected!");
                 System.out.println("Alarm Triggered!");
             }
 
@@ -67,7 +69,7 @@ public class HardwareLink implements Runnable {
             //TODO: Protect against multiple calls!
             if (alarmTriggered && alarmServiced && !alarmDeactivated
                     && (((System.currentTimeMillis() / 1000L) - lastPresenceTimestamp) > USERREACTIONTIMESECONDS)) {
-                sendMQTTmessage("Presence detected!");
+                sendMQTTmessage(mqttMessage);
             }
 
             //Caregiver has responded to call. No need to warn external agent
