@@ -23,7 +23,8 @@ import com.fazecast.jSerialComm.*;
 public class HardwareLink implements Runnable {
 
     //MQTT variables
-    private Server mqttBroker = new Server();
+    //private Server mqttBroker = new Server();
+    private MqttBroker mqttBroker = new MqttBroker();
     private final int mqttQos = 2;
     private final String mqttPort = "1986";
     private final String mqttBrokerURL = "tcp://localhost:" + mqttPort;
@@ -40,7 +41,7 @@ public class HardwareLink implements Runnable {
     private final String cpName = "Circuit Playground Expresso";
     private final String triggerAlarmMessage = "a";
     private final String deactivateAlarmMessage = "d";
-    private final String buttonPressedMessage = "d";
+    private final String buttonPressedMessage = "b";
     private boolean serialOpened = false;
 
     //Logic variables
@@ -76,6 +77,7 @@ public class HardwareLink implements Runnable {
                     && (((System.currentTimeMillis() / 1000L) - lastPresenceTimestamp) > USERREACTIONTIMESECONDS)) {
                 sendMQTTmessage(mqttMessage);
                 alarmTriggeredSecondary = true;
+                alarmServiced = false;
             }
 
             //Caregiver has responded to call. No need to warn external agent
@@ -100,42 +102,10 @@ public class HardwareLink implements Runnable {
     public void startHardwareLink() {
         //Start MQTT Broker
         try {
-            Properties mqttBrokerProps = new Properties();
-            mqttBrokerProps.put(PERSISTENT_STORE_PROPERTY_NAME, mqttPersistence);
-            mqttBrokerProps.put(BrokerConstants.PORT_PROPERTY_NAME, mqttPort);
-            mqttBrokerProps.put(BrokerConstants.ALLOW_ANONYMOUS_PROPERTY_NAME, true);
-            mqttBroker.startServer(mqttBrokerProps);
+            mqttBroker.startServer(mqttPort);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        /*
-            static MqttClientPersistence s_dataStore;
-            static MqttClientPersistence s_pubDataStore;
-            static Server m_server;
-
-            protected static void startServer(String port) throws IOException {
-                System.out.println("Starting broker server");
-                String tmpDir = System.getProperty("java.io.tmpdir");
-                s_dataStore = new MqttDefaultFilePersistence(tmpDir);
-                s_pubDataStore = new MqttDefaultFilePersistence(tmpDir + File.separator + "publisher");
-
-                Properties m_properties = new Properties();
-                m_properties.put(PERSISTENT_STORE_PROPERTY_NAME, s_pubDataStore);
-                m_properties.put(BrokerConstants.PORT_PROPERTY_NAME, port);
-                // m_properties.put(BrokerConstants.PORT_PROPERTY_NAME, Integer.toString(BrokerConstants.PORT));
-                // m_properties.put(BrokerConstants.HOST_PROPERTY_NAME, BrokerConstants.HOST);
-                // m_properties.put(BrokerConstants.WEB_SOCKET_PORT_PROPERTY_NAME,
-                // Integer.toString(BrokerConstants.WEBSOCKET_PORT));
-                // m_properties.put(BrokerConstants.PASSWORD_FILE_PROPERTY_NAME, "");
-                //m_properties.put(BrokerConstants.PERSISTENT_STORE_PROPERTY_NAME,
-                //BrokerConstants.DEFAULT_PERSISTENT_PATH);
-                m_properties.put(BrokerConstants.ALLOW_ANONYMOUS_PROPERTY_NAME, true);
-                // m_properties.put(BrokerConstants.AUTHENTICATOR_CLASS_NAME, "");
-                // m_properties.put(BrokerConstants.AUTHORIZATOR_CLASS_NAME, "");
-
-                m_server = new Server();
-                m_server.startServer(m_properties);*/
 
         //Start MQTT client
         try {

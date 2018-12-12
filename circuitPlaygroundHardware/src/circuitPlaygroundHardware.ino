@@ -10,22 +10,22 @@
 // sensitivity.  See this great guide for more details:
 //   https://learn.adafruit.com/led-tricks-gamma-correction/the-issue
 const uint8_t PROGMEM gamma8[] = {
-    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1,  1,  1,
-    1,  1,  1,  1,  1,  1,  1,  1,  1,  2,  2,  2,  2,  2,  2,  2,
-    2,  3,  3,  3,  3,  3,  3,  3,  4,  4,  4,  4,  4,  5,  5,  5,
-    5,  6,  6,  6,  6,  7,  7,  7,  7,  8,  8,  8,  9,  9,  9, 10,
-   10, 10, 11, 11, 11, 12, 12, 13, 13, 13, 14, 14, 15, 15, 16, 16,
-   17, 17, 18, 18, 19, 19, 20, 20, 21, 21, 22, 22, 23, 24, 24, 25,
-   25, 26, 27, 27, 28, 29, 29, 30, 31, 32, 32, 33, 34, 35, 35, 36,
-   37, 38, 39, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 50,
-   51, 52, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 66, 67, 68,
-   69, 70, 72, 73, 74, 75, 77, 78, 79, 81, 82, 83, 85, 86, 87, 89,
-   90, 92, 93, 95, 96, 98, 99,101,102,104,105,107,109,110,112,114,
-  115,117,119,120,122,124,126,127,129,131,133,135,137,138,140,142,
-  144,146,148,150,152,154,156,158,160,162,164,167,169,171,173,175,
-  177,180,182,184,186,189,191,193,196,198,200,203,205,208,210,213,
-  215,218,220,223,225,228,231,233,236,239,241,244,247,249,252,255 };
+      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1,  1,  1,
+      1,  1,  1,  1,  1,  1,  1,  1,  1,  2,  2,  2,  2,  2,  2,  2,
+      2,  3,  3,  3,  3,  3,  3,  3,  4,  4,  4,  4,  4,  5,  5,  5,
+      5,  6,  6,  6,  6,  7,  7,  7,  7,  8,  8,  8,  9,  9,  9, 10,
+     10, 10, 11, 11, 11, 12, 12, 13, 13, 13, 14, 14, 15, 15, 16, 16,
+     17, 17, 18, 18, 19, 19, 20, 20, 21, 21, 22, 22, 23, 24, 24, 25,
+     25, 26, 27, 27, 28, 29, 29, 30, 31, 32, 32, 33, 34, 35, 35, 36,
+     37, 38, 39, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 50,
+     51, 52, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 66, 67, 68,
+     69, 70, 72, 73, 74, 75, 77, 78, 79, 81, 82, 83, 85, 86, 87, 89,
+     90, 92, 93, 95, 96, 98, 99,101,102,104,105,107,109,110,112,114,
+    115,117,119,120,122,124,126,127,129,131,133,135,137,138,140,142,
+    144,146,148,150,152,154,156,158,160,162,164,167,169,171,173,175,
+    177,180,182,184,186,189,191,193,196,198,200,203,205,208,210,213,
+    215,218,220,223,225,228,231,233,236,239,241,244,247,249,252,255 };
 
 //Random frequencies and phases will be generated for each pixel to
 //define an organic but random looking flicker effect.
@@ -93,50 +93,50 @@ void loop() {
     if (alarmTriggered) {
         showLitFlicker(millisNow);
     } else {
+        Serial.print("b");
         CircuitPlayground.strip.clear();
         CircuitPlayground.strip.show();
     }
 
     //If button is pressed then we deactivate the alarm and inform
     if ((rightToggle || leftToggle) && alarmTriggered) {
-      alarmTriggered = false;
-      Serial.print("b");
-      leftToggle = false;
-      rightToggle = false;
+        alarmTriggered = false;
+        leftToggle = false;
+        rightToggle = false;
     }
 }
 
 //Checks serial for "a" to activate alarm or "d" to deactivate
 void checkSerial() {
-  if (Serial.available()) {
-    char inChar = Serial.read();
-    if (inChar == 'a' || inChar == 'A') {
-      triggerAlarm();
-    } else if (inChar == 'd' || inChar == 'D') {
-      deactivateAlarm();
+    if (Serial.available()) {
+        char inChar = Serial.read();
+        if (inChar == 'a' || inChar == 'A') {
+            triggerAlarm();
+        } else if (inChar == 'd' || inChar == 'D') {
+            deactivateAlarm();
+        }
+        //Clear buffer
+        while (Serial.available()) {
+        Serial.read();
+        }
     }
-    //Clear buffer
-    while (Serial.available()) {
-      Serial.read();
-    }
-  }
 }
 
 void triggerAlarm() {
-  /*CircuitPlayground.speaker.say(spEMERGENCY);
-  delay(25);
-  CircuitPlayground.speaker.say(spJULIET);
-  delay(25);
-  CircuitPlayground.speaker.say(spIS);
-  delay(25);
-  CircuitPlayground.speaker.say(spUP);
-  delay(25);
-  CircuitPlayground.speaker.say(spEMERGENCY);*/
-  alarmTriggered = true;
+    /*CircuitPlayground.speaker.say(spEMERGENCY);
+    delay(25);
+    CircuitPlayground.speaker.say(spJULIET);
+    delay(25);
+    CircuitPlayground.speaker.say(spIS);
+    delay(25);
+    CircuitPlayground.speaker.say(spUP);
+    delay(25);
+    CircuitPlayground.speaker.say(spEMERGENCY);*/
+    alarmTriggered = true;
 }
 
 void deactivateAlarm() {
-  alarmTriggered = false;
+    alarmTriggered = false;
 }
 
 //Check button presses
@@ -161,15 +161,15 @@ void checkButtons(uint32_t millisNow) {
 // Will automatically convert from HSV color space to RGB and apply gamma
 // correction.
 void setPixelHSV(int i, float h, float s, float v) {
-  // Convert HSV to RGB
-  float r, g, b = 0.0;
-  HSVtoRGB(&r, &g, &b, h, s, v);
-  // Lookup gamma correct RGB colors (also convert from 0...1.0 RGB range to 0...255 byte range).
-  uint8_t r1 = pgm_read_byte(&gamma8[int(r*255.0)]);
-  uint8_t g1 = pgm_read_byte(&gamma8[int(g*255.0)]);
-  uint8_t b1 = pgm_read_byte(&gamma8[int(b*255.0)]);
-  // Set the color of the pixel.
-  CircuitPlayground.strip.setPixelColor(i, r1, g1, b1);
+    // Convert HSV to RGB
+    float r, g, b = 0.0;
+    HSVtoRGB(&r, &g, &b, h, s, v);
+    // Lookup gamma correct RGB colors (also convert from 0...1.0 RGB range to 0...255 byte range).
+    uint8_t r1 = pgm_read_byte(&gamma8[int(r*255.0)]);
+    uint8_t g1 = pgm_read_byte(&gamma8[int(g*255.0)]);
+    uint8_t b1 = pgm_read_byte(&gamma8[int(b*255.0)]);
+    // Set the color of the pixel.
+    CircuitPlayground.strip.setPixelColor(i, r1, g1, b1);
 }
 
 // Flickering candle animation effect.
@@ -210,109 +210,109 @@ void showLitFlicker(uint32_t current) {
 // HSV to RGB color space conversion function taken directly from:
 //  https://www.cs.rit.edu/~ncs/color/t_convert.html
 void HSVtoRGB( float *r, float *g, float *b, float h, float s, float v ) {
-  int i;
-  float f, p, q, t;
-  if( s == 0 ) {
-    // achromatic (grey)
-    *r = *g = *b = v;
-    return;
-  }
-  h /= 60;      // sector 0 to 5
-  i = floor( h );
-  f = h - i;      // factorial part of h
-  p = v * ( 1 - s );
-  q = v * ( 1 - s * f );
-  t = v * ( 1 - s * ( 1 - f ) );
-  switch( i ) {
-    case 0:
-      *r = v;
-      *g = t;
-      *b = p;
-      break;
-    case 1:
-      *r = q;
-      *g = v;
-      *b = p;
-      break;
-    case 2:
-      *r = p;
-      *g = v;
-      *b = t;
-      break;
-    case 3:
-      *r = p;
-      *g = q;
-      *b = v;
-      break;
-    case 4:
-      *r = t;
-      *g = p;
-      *b = v;
-      break;
-    default:    // case 5:
-      *r = v;
-      *g = p;
-      *b = q;
-      break;
-  }
+    int i;
+    float f, p, q, t;
+    if( s == 0 ) {
+        // achromatic (grey)
+        *r = *g = *b = v;
+        return;
+    }
+    h /= 60;      // sector 0 to 5
+    i = floor( h );
+    f = h - i;      // factorial part of h
+    p = v * ( 1 - s );
+    q = v * ( 1 - s * f );
+    t = v * ( 1 - s * ( 1 - f ) );
+    switch( i ) {
+        case 0:
+            *r = v;
+            *g = t;
+            *b = p;
+            break;
+        case 1:
+            *r = q;
+            *g = v;
+            *b = p;
+            break;
+        case 2:
+            *r = p;
+            *g = v;
+            *b = t;
+            break;
+        case 3:
+            *r = p;
+            *g = q;
+            *b = v;
+            break;
+        case 4:
+            *r = t;
+            *g = p;
+            *b = v;
+            break;
+        default:    // case 5:
+            *r = v;
+            *g = p;
+            *b = q;
+            break;
+    }
 }
 
 // Linear interpolation of value y within y0...y1 given x and x0...x1.
 float lerp(float x, float x0, float x1, float y0, float y1) {
-  return y0 + (x - x0) * ((y1 - y0) / (x1 - x0));
+    return y0 + (x - x0) * ((y1 - y0) / (x1 - x0));
 }
 
-  /************* TEST CAPTOUCH */
-  // Serial.print("Capsense #3: "); Serial.println(CircuitPlayground.readCap(3));
-  // Serial.print("Capsense #2: "); Serial.println(CircuitPlayground.readCap(2));
-  // if (! CircuitPlayground.isExpress()) {  // CPX does not have this captouch pin
-  //   Serial.print("Capsense #0: "); Serial.println(CircuitPlayground.readCap(0));
-  // }
-  // Serial.print("Capsense #1: "); Serial.println(CircuitPlayground.readCap(1));
-  // Serial.print("Capsense #12: "); Serial.println(CircuitPlayground.readCap(12));
-  // Serial.print("Capsense #6: "); Serial.println(CircuitPlayground.readCap(6));
-  // Serial.print("Capsense #9: "); Serial.println(CircuitPlayground.readCap(9));
-  // Serial.print("Capsense #10: "); Serial.println(CircuitPlayground.readCap(10));
-  
-  /************* TEST SLIDE SWITCH */
-  // if (CircuitPlayground.slideSwitch()) {
-  //   Serial.println("Slide to the left");
-  // } else {
-  //   Serial.println("Slide to the right");
-  //   //CircuitPlayground.playTone(500 + pixeln * 500, 100);
-  // }
+/************* TEST CAPTOUCH */
+// Serial.print("Capsense #3: "); Serial.println(CircuitPlayground.readCap(3));
+// Serial.print("Capsense #2: "); Serial.println(CircuitPlayground.readCap(2));
+// if (! CircuitPlayground.isExpress()) {  // CPX does not have this captouch pin
+//   Serial.print("Capsense #0: "); Serial.println(CircuitPlayground.readCap(0));
+// }
+// Serial.print("Capsense #1: "); Serial.println(CircuitPlayground.readCap(1));
+// Serial.print("Capsense #12: "); Serial.println(CircuitPlayground.readCap(12));
+// Serial.print("Capsense #6: "); Serial.println(CircuitPlayground.readCap(6));
+// Serial.print("Capsense #9: "); Serial.println(CircuitPlayground.readCap(9));
+// Serial.print("Capsense #10: "); Serial.println(CircuitPlayground.readCap(10));
 
-  // /************* TEST 10 NEOPIXELS */
-  // CircuitPlayground.setPixelColor(pixeln++, CircuitPlayground.colorWheel(25 * pixeln));
-  // if (pixeln == 11) {
-  //   pixeln = 0;
-  //   CircuitPlayground.clearPixels();
-  // }
+/************* TEST SLIDE SWITCH */
+// if (CircuitPlayground.slideSwitch()) {
+//   Serial.println("Slide to the left");
+// } else {
+//   Serial.println("Slide to the right");
+//   //CircuitPlayground.playTone(500 + pixeln * 500, 100);
+// }
 
-  // /************* TEST BOTH BUTTONS */
-  // if (CircuitPlayground.leftButton()) {
-  //   Serial.println("Left button pressed!");
-  // }
-  // if (CircuitPlayground.rightButton()) {
-  //   Serial.println("Right button pressed!");
-  // }
+// /************* TEST 10 NEOPIXELS */
+// CircuitPlayground.setPixelColor(pixeln++, CircuitPlayground.colorWheel(25 * pixeln));
+// if (pixeln == 11) {
+//   pixeln = 0;
+//   CircuitPlayground.clearPixels();
+// }
 
-  // /************* TEST LIGHT SENSOR */
-  // Serial.print("Light sensor: ");
-  // Serial.println(CircuitPlayground.lightSensor());
+// /************* TEST BOTH BUTTONS */
+// if (CircuitPlayground.leftButton()) {
+//   Serial.println("Left button pressed!");
+// }
+// if (CircuitPlayground.rightButton()) {
+//   Serial.println("Right button pressed!");
+// }
 
-  // /************* TEST SOUND SENSOR */
-  // Serial.print("Sound sensor: ");
-  // Serial.println(CircuitPlayground.mic.soundPressureLevel(10));
+// /************* TEST LIGHT SENSOR */
+// Serial.print("Light sensor: ");
+// Serial.println(CircuitPlayground.lightSensor());
 
-  // /************* TEST ACCEL */
-  // // Display the results (acceleration is measured in m/s*s)
-  // Serial.print("X: "); Serial.print(CircuitPlayground.motionX());
-  // Serial.print(" \tY: "); Serial.print(CircuitPlayground.motionY());
-  // Serial.print(" \tZ: "); Serial.print(CircuitPlayground.motionZ());
-  // Serial.println(" m/s^2");
+// /************* TEST SOUND SENSOR */
+// Serial.print("Sound sensor: ");
+// Serial.println(CircuitPlayground.mic.soundPressureLevel(10));
 
-  // /************* TEST THERMISTOR */
-  // Serial.print("Temperature ");
-  // Serial.print(CircuitPlayground.temperature());
-  // Serial.println(" *C");
+// /************* TEST ACCEL */
+// // Display the results (acceleration is measured in m/s*s)
+// Serial.print("X: "); Serial.print(CircuitPlayground.motionX());
+// Serial.print(" \tY: "); Serial.print(CircuitPlayground.motionY());
+// Serial.print(" \tZ: "); Serial.print(CircuitPlayground.motionZ());
+// Serial.println(" m/s^2");
+
+// /************* TEST THERMISTOR */
+// Serial.print("Temperature ");
+// Serial.print(CircuitPlayground.temperature());
+// Serial.println(" *C");
