@@ -40,22 +40,16 @@ public class HardwareLink implements Runnable {
     private final int serialBauds = 115200;
     private final String cpName = "Circuit Playground Expresso";
     private final String triggerAlarmMessage = "a";
-    private final String deactivateAlarmMessage = "d";
     private final String buttonPressedMessage = "b";
     private boolean serialOpened = false;
 
     //Logic variables
     //Time the caregiver has to react to the hardware warning
     private final long USERREACTIONTIMESECONDS = 10;
-    //Set to true externally. inits chain of events
-    private boolean alarmTriggeredPrimary = false;
-    //Keeps track of MQTT warning to not repeat reiggers
-    private boolean alarmTriggeredSecondary = false;
-    //Keeps track of when the system is servicing the warning
-    private boolean alarmServiced = false;
-    //Used for checking button press
-    private boolean alarmDeactivated = false;
     private long lastPresenceTimestamp = 0;
+
+    enum States { Waiting, Triggered, WButton, MQTT };
+    private States actState = States.Waiting;
 
     //Thread that handles HW triggering
     //Triggers CircuitPlayground HW and waits for button press
@@ -63,30 +57,21 @@ public class HardwareLink implements Runnable {
     @Override
     public void run() {
         while(true) {
-            //Chain of events starts when alarmTriggered
-            if (alarmTriggeredPrimary && !alarmServiced) {
-                lastPresenceTimestamp = System.currentTimeMillis() / 1000L;
-                alarmServiced = true;
-                alarmDeactivated = false;
-                alarmTriggeredSecondary = false;
+            //Other state transitions not reflected here are:
+            //initWarnSequence() sets to States.Triggered if in Wating
+            //Serial event "b" sets States.Waiting if in Triggered
+            if (actState.equals(States.Triggered)) {
                 triggerSerialAlarm();
-            }
-
-            //Alarm has been triggered and serviced so we check if time has passed to warn external agent
-            if (alarmTriggeredPrimary && !alarmTriggeredSecondary && alarmServiced && !alarmDeactivated
-                    && (((System.currentTimeMillis() / 1000L) - lastPresenceTimestamp) > USERREACTIONTIMESECONDS)) {
+                lastPresenceTimestamp = System.currentTimeMillis() / 1000L;
+                actState = States.WButton;
+            } else if (actState.equals(States.WButton)) {
+                //If time passes with no press we send mqtt warning
+                if (((System.currentTimeMillis() / 1000L) - lastPresenceTimestamp) > USERREACTIONTIMESECONDS) {
+                    actState = States.MQTT;
+                }
+            } else if (actState.equals(States.MQTT)) {
                 sendMQTTmessage(mqttMessage);
-                alarmTriggeredSecondary = true;
-                alarmServiced = false;
-            }
-
-            //Caregiver has responded to call. No need to warn external agent
-            if (alarmDeactivated) {
-                alarmTriggeredPrimary = false;
-                alarmTriggeredSecondary = false;
-                alarmServiced = false;
-                alarmDeactivated = false;
-                lastPresenceTimestamp = 0;
+                actState = States.Waiting;
             }
 
             //Sleeps thread
@@ -140,7 +125,10 @@ public class HardwareLink implements Runnable {
                 //System.out.println("Read " + numRead + " bytes.");
                 //System.out.println("Message: " + new String(newData));
                 if (new String(newData).equalsIgnoreCase(buttonPressedMessage)) {
-                    alarmDeactivated = true;
+                    //alarmDeactivated = true;
+                    if (actState.equals(States.WButton)) {
+                        actState = States.Waiting;
+                    }
                 }
             }
         });
@@ -153,22 +141,14 @@ public class HardwareLink implements Runnable {
 
     //Triggers flag to make run() trigger hardware
     public void initWarnSequence() {
-        alarmTriggeredPrimary = true;
-    }
-
-    public void stopWarnSequence() {
-        alarmTriggeredPrimary = false;
+        if (actState.equals(States.Waiting)) {
+            actState = States.Triggered;
+        }
     }
 
     private void triggerSerialAlarm() {
         if (serialOpened) {
             circuitPlayground.writeBytes(triggerAlarmMessage.getBytes(), 1);
-        }
-    }
-
-    private void deactivateSerialAlarm() {
-        if (serialOpened) {
-            circuitPlayground.writeBytes(deactivateAlarmMessage.getBytes(), 1);
         }
     }
 

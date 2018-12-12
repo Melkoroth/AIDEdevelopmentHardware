@@ -300,6 +300,7 @@ void mqttReconnect() {
         mqttClient.subscribe(mqttSubTopic);
     } else {
         Sprint("failed, rc=");
+        clearLCD();
         SeeedGrayOled.setTextXY(4, 0);
         SeeedGrayOled.putString("MQTT Fail...");
         SeeedGrayOled.setTextXY(5, 0);

@@ -141,15 +141,17 @@ void deactivateAlarm() {
 
 //Check button presses
 void checkButtons(uint32_t millisNow) {
-    if (millisNow - lastTouchMillis > 250) {
+    if (millisNow - lastTouchMillis > 100) {
         lastTouchMillis = millisNow;
         if (CircuitPlayground.leftButton()) {
             //Serial.println("Left button pressed!");
             leftToggle = true;
+            Serial.print("b");
         }
         if (CircuitPlayground.rightButton()) {
             //Serial.println("Right button pressed!");
             rightToggle = true;
+            Serial.print("b");
         }
     } 
 }
