@@ -93,47 +93,6 @@
       <artifactId>jSerialComm</artifactId>
       <version>[2.0.0,3.0.0)</version>
     </dependency>
-
-    <!--<dependency>
-      <groupId>net.sf.jali</groupId>
-      <artifactId>jali-adm</artifactId>
-      <version>${jali.version}</version>
-    </dependency>
-     <dependency>
-      <groupId>net.sf.jali</groupId>
-      <artifactId>jali-phat-client</artifactId>
-      <version>${jali.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>net.sf.jdos</groupId>
-      <artifactId>jdos-sm</artifactId>
-      <version>${jdos.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>net.sf.jdos</groupId>
-      <artifactId>jdos-common</artifactId>
-      <version>${jdos.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>net.sf.phat</groupId>
-      <artifactId>phat-devices</artifactId>
-      <version>${phat.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>net.sf.phat</groupId>
-      <artifactId>phat-api-server</artifactId>
-      <version>${phat.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.thetransactioncompany</groupId>
-      <artifactId>jsonrpc2-base</artifactId>
-      <version>1.38</version>
-    </dependency>
-    <dependency>
-      <groupId>org.reflections</groupId>
-      <artifactId>reflections</artifactId>
-      <version>0.9.10</version>
-    </dependency>-->
   </dependencies>
 
   <build>
@@ -160,6 +119,40 @@
     <artifactId>maven-dependency-plugin</artifactId>
     <version>2.2</version>
   </plugin>
+  <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-dependency-plugin</artifactId>
+    <version>3.1.1</version>
+    <executions>
+        <execution>
+            <id>copy-dependencies</id>
+            <phase>prepare-package</phase>
+            <goals>
+                <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+                <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                <overWriteReleases>false</overWriteReleases>
+                <overWriteSnapshots>false</overWriteSnapshots>
+                <overWriteIfNewer>true</overWriteIfNewer>
+            </configuration>
+        </execution>
+      </executions>
+    </plugin>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.1.0</version>
+        <configuration>
+            <archive>
+                <manifest>
+                    <addClasspath>true</addClasspath>
+                    <classpathPrefix>lib</classpathPrefix> 
+                    <mainClass>phat.BeaglePresenceSensor.Main</mainClass> -->
+                </manifest>
+            </archive>
+        </configuration>
+    </plugin>
   <!--       <plugin>
     <groupId>org.apache.maven.plugins</groupId>
     <artifactId>maven-shade-plugin</artifactId>
@@ -234,7 +227,7 @@
     </repository>
     <repository>
       <id>Eclipse Paho Repo</id>
-      <url>https://repo.eclipse.org/content/repositories/paho-releases/&gt;</url>
+      <url>https://repo.eclipse.org/content/repositories/paho-releases/</url>
     </repository>
     <repository>
       <id>bintray</id>

@@ -1,0 +1,6 @@
+phat/HardwareLink$States.class
+phat/HardwareLink.class
+phat/BeaglePresenceSensor.class
+phat/PhatPresenceSensor.class
+phat/HardwareLink$1.class
+phat/MqttBroker.class

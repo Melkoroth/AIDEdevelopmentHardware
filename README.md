@@ -54,6 +54,26 @@ Internally the hardware keeps waiting for a MQTT message sent through the *prese
 
 This is a wifi-enabled device so you should check ssid & password settings in the .ino.
 
+## Working with BeagleBone
+[Setting up JAVA, Gradle and Maven](https://hackaday.io/page/1243-setting-up-oracle-java-8-gradle-and-maven-on-beaglebone-green)
+ 
+Once plugged in through USB various communication interfaces are set up.
+You can SSH for example to 192.168.7.2 with the following default parameters:
+
+```bash
+debian | temppwd
+```
+Once inside set up Wi-Fi following [this guide](https://www.digikey.com/en/maker/blogs/2017/how-to-setup-wifi-on-the-beaglebone-black-wireless)
+
+You now need to clone the project (if it's not already there), compile and run it:
+
+```bash
+cd AIDEdevelopmentHardware/phatHardwareLink/
+mvn compile
+```
+Be warned that **first time compiling takes 1+ hours**
+
+
 ## **---DEPRECATED---**
 
 ## Using the MQTT broker

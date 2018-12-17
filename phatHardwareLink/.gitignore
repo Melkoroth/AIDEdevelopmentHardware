@@ -1,7 +1,7 @@
-/target/
+#/target/
 /assets/
 /out/
-/*/target/
+#/*/target/
 /.idea/
 *.iml
 *.log

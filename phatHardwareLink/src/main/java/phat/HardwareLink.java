@@ -145,7 +145,7 @@ public class HardwareLink implements Runnable {
             actState = States.Triggered;
         }
     }
-
+    //Triggers alarm on circuit playground
     private void triggerSerialAlarm() {
         if (serialOpened) {
             circuitPlayground.writeBytes(triggerAlarmMessage.getBytes(), 1);
