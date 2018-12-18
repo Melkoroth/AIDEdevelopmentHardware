@@ -59,11 +59,19 @@ This is a wifi-enabled device so you should check ssid & password settings in th
  
 Once plugged in through USB various communication interfaces are set up.
 You can SSH for example to 192.168.7.2 with the following default parameters:
-
 ```bash
 debian | temppwd
 ```
-Once inside set up Wi-Fi following [this guide](https://www.digikey.com/en/maker/blogs/2017/how-to-setup-wifi-on-the-beaglebone-black-wireless)
+Once inside you have to set up Wi-Fi if it's needed:
+```bash
+sudo connmanctl
+connmanctl> scan wifi
+connmanctl> services
+connmanctl> agent on
+connmanctl> connect wifi_XXXXXXXXX_XXXXX
+connmanctl> quit
+ifconfig -a
+```
 
 You now need to clone the project (if it's not already there), compile and run it:
 

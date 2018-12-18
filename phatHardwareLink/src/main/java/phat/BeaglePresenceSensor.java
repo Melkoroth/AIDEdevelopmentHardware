@@ -3,21 +3,41 @@ package phat;
 import java.io.*;
 import java.io.IOException;
 
+import io.silverspoon.bulldog.beagleboneblack.*;
+import io.silverspoon.bulldog.core.gpio.DigitalInput;
+import io.silverspoon.bulldog.core.gpio.DigitalOutput;
+import io.silverspoon.bulldog.core.platform.Board;
+import io.silverspoon.bulldog.core.platform.Platform;
+import io.silverspoon.bulldog.core.util.BulldogUtil;
+
 public class BeaglePresenceSensor {
     static HardwareLink hwLink = new HardwareLink();
 
     private static String LED3_PATH = "/sys/class/leds/beaglebone:green:usr3";
 
     public static void main(String[] args) throws IOException {
+        Board board = Platform.createBoard();
+
+        DigitalOutput led = (DigitalOutput) board.getPinByAlias("P8_8");
 
         //Start link to hardware
         hwLink.startHardwareLink();
 
-        writeLED("/trigger", "timer", LED3_PATH);
+        /*writeLED("/trigger", "timer", LED3_PATH);
         writeLED("/delay_on", "50", LED3_PATH);
-        writeLED("/delay_off", "50", LED3_PATH);
+        writeLED("/delay_off", "50", LED3_PATH);*/
 
         hwLink.initWarnSequence();
+
+        led.high();
+        BulldogUtil.sleepMs(1000);
+        led.low();
+        BulldogUtil.sleepMs(1000);
+        led.high();
+        BulldogUtil.sleepMs(1000);
+        led.low();
+        BulldogUtil.sleepMs(1000);
+        led.high();
 
         /*System.out.println("Starting the LED Java Application");
         if(args.length!=1) {

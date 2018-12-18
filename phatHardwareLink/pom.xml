@@ -93,6 +93,11 @@
       <artifactId>jSerialComm</artifactId>
       <version>[2.0.0,3.0.0)</version>
     </dependency>
+    <dependency>
+      <groupId>io.silverspoon</groupId>
+      <artifactId>bulldog-board-beagleboneblack</artifactId>
+      <version>0.3.0</version>
+    </dependency>
   </dependencies>
 
   <build>
