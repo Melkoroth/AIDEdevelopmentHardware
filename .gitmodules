@@ -1,13 +1,17 @@
-[submodule "espHardware/lib/OLED_Display_96X96"]
-	path = espHardware/lib/OLED_Display_96X96
+[submodule "espHardwareReceiver/lib/OLED_Display_96X96"]
+	path = espHardwareReceiver/lib/OLED_Display_96X96
 	url = https://github.com/Seeed-Studio/OLED_Display_96X96.git
-[submodule "espHardware/lib/pubsubclient"]
-	path = espHardware/lib/pubsubclient
+[submodule "espHardwareReceiver/lib/pubsubclient"]
+	path = espHardwareReceiver/lib/pubsubclient
 	url = https://github.com/knolleary/pubsubclient.git
-[submodule "espHardware/lib/Adafruit_MPR121"]
-	path = espHardware/lib/Adafruit_MPR121
+[submodule "espHardwareReceiver/lib/Adafruit_MPR121"]
+	path = espHardwareReceiver/lib/Adafruit_MPR121
 	url = https://github.com/adafruit/Adafruit_MPR121.git
 
 [submodule "circuitPlaygroundHardware/lib/Adafruit_CircuitPlayground"]
 	path = circuitPlaygroundHardware/lib/Adafruit_CircuitPlayground
 	url = https://github.com/adafruit/Adafruit_CircuitPlayground.git
+
+[submodule "espHardwarePresence/lib/pubsubclient"]
+	path = espHardwarePresence/lib/pubsubclient
+	url = https://github.com/knolleary/pubsubclient.git

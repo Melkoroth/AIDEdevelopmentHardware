@@ -123,7 +123,7 @@ void checkSerial() {
 }
 
 void triggerAlarm() {
-    /*CircuitPlayground.speaker.say(spEMERGENCY);
+    CircuitPlayground.speaker.say(spEMERGENCY);
     delay(25);
     CircuitPlayground.speaker.say(spJULIET);
     delay(25);
@@ -131,7 +131,7 @@ void triggerAlarm() {
     delay(25);
     CircuitPlayground.speaker.say(spUP);
     delay(25);
-    CircuitPlayground.speaker.say(spEMERGENCY);*/
+    CircuitPlayground.speaker.say(spEMERGENCY);
     alarmTriggered = true;
 }
 

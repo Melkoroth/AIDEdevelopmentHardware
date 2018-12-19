@@ -28,7 +28,7 @@ public class HardwareLink implements Runnable, MqttCallback {
     private final String mqttClientId = "JAVAHardwareLink";
     private final String mqttTopic = "presence";
     private final String mqttMessage = "Warning!";
-    private final MemoryPersistence mqttPersistence = new MemoryPersistence();
+    //private final MemoryPersistence mqttPersistence = new MemoryPersistence();
     //private MqttClient mqttClient;
     private MqttAsyncClient mqttClient;
     private MqttConnectOptions connOpts;

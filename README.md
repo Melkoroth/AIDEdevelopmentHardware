@@ -20,18 +20,25 @@ As it is a derived project which uses [PHATSIM](https://github.com/Grasia/phatsi
 3. The system waits now for the caregiver to acknowledge the warning by the press of a button.
 4. If the time passes by and the system doesn't detect the caregiver's interaction it will alert the secondary device, the ESP8266. This device can rest in an external location so we get redundancy in case of an emergency.
 
+## Preparation
+The experiments are designed so that every device (PC, Beaglebone Black Wifi and ESP8266's) should be connected to the same WiFi for MQTT to work.
+CircuitPlayground Express should be connected to the PC's serial port.
+
+Both PC JAVA program set up the MQTT Broker. 
+
 ## phatHardwareLink
 [![OpenJDK Version](https://img.shields.io/badge/openjdk-v1.8-red.svg)](http://openjdk.java.net/)
 [![Maven Version](https://img.shields.io/badge/maven-v3.1.1-orange.svg)](http://maven.apache.org/)
 
-This is the main JAVA project and the *brain* of the system. It consists of two main classes: **PhatPresenceSensor** and **BeaglePresenceSensor**. Each one of them cover one of the proposed experiments.
+This is the main JAVA project and the *brain* of the system. It consists of two main classes: **PhatPresenceSensor** and **LaunchHardwareLink**. Each one of them cover one of the proposed experiments.
 
-Both perform the same duties of managing a presence sensor. The difference is that in PHATSim the sensor is virtual whereas in the BeagleBone a real presence sensor is used.
+Both perform the same duties of managing a presence sensor. The difference is that in PHATSim the sensor is virtual whereas in the other one a real presence sensor is used.
 
 For this, both call the same methods that init the **HardwareLink** which is used to communicate with the caregiver's hardware when the presence is detected.
 The important methods this class has are these:
 * startHardwareLink() inits class, MQTT broker, client and serial interfaces.
-* initWarnSequence() is called when movement in the room is detected
+* initWarnSequence() is called when movement in the room is detected in PHATSim.
+* For the ESP8266's hardware sensor sending a MQTT message on topic "presence" with the message "alarm" has the same effects as calling initWarnSequence.
 
 ## circuitPlaygroundHardware
 [![C++ Arduino](https://img.shields.io/badge/c%2B%2B-Arduino%20-red.svg)](https://github.com/adafruit/Adafruit_CircuitPlayground)
@@ -43,50 +50,46 @@ This is a C++ project developed using Platformio framework for the Adafruit Hard
 Internally the hardware keeps waiting for the serial character 'a' which means that the alarm has been triggered.
 When the alarm is triggered it will flash lights, speak out loud and wait for the caregiver to acknowledge the warning with the press of any button. Once the user has acknowledged the message a 'b' is returned through serial.
 
-## espHardware
+## espHardwareReceiver
 [![C++ Arduino](https://img.shields.io/badge/c%2B%2B-Arduino%20-red.svg)](https://github.com/adafruit/Adafruit_CircuitPlayground)
 [![Platformio Version](https://img.shields.io/badge/platformio-3.6.2-orange.svg)](https://platformio.org/)
 [![Platform](https://img.shields.io/badge/platform-ESP8266-yellow.svg)](https://platformio.org/platforms/espressif8266)
 
-This is a C++ project developed using Platformio framework for the Espresiff's ESP8266 hardware. The other hardware required is a [Seeedstudio OLED screen](http://wiki.seeedstudio.com/Grove-OLED_Display_1.12inch/) and a LED.
+This is a C++ project developed using Platformio framework for the Espresiff's ESP8266 hardware. The other hardware required is a [Seeedstudio OLED screen](http://wiki.seeedstudio.com/Grove-OLED_Display_1.12inch/).
 
-Internally the hardware keeps waiting for a MQTT message sent through the *presence* topic. Once this message arrives the OLED screen displays a big warning sign with the received message and a LED is switched on.
+### Pinout
+| ESP8266       | OLED         |
+| ------------- |-------------:|
+| 3.3V          | VCC          |
+| GND           | GND          |
+| D2            | SDA          |
+| D1            | SCL          |
+
+Internally the hardware keeps waiting for the MQTT message *Warning!* sent through the *presence* topic. Once this message arrives the OLED screen displays a big warning sign with the received message and a LED is switched on.
 
 This is a wifi-enabled device so you should check ssid & password settings in the .ino.
 
-## Working with BeagleBone
-[Setting up JAVA, Gradle and Maven](https://hackaday.io/page/1243-setting-up-oracle-java-8-gradle-and-maven-on-beaglebone-green)
- 
-Once plugged in through USB various communication interfaces are set up.
-You can SSH for example to 192.168.7.2 with the following default parameters:
-```bash
-debian | temppwd
-```
-Once inside you have to set up Wi-Fi if it's needed:
-```bash
-sudo connmanctl
-connmanctl> scan wifi
-connmanctl> services
-connmanctl> agent on
-connmanctl> connect wifi_XXXXXXXXX_XXXXX
-connmanctl> quit
-ifconfig -a
-```
+## espHardwarePresence
+[![C++ Arduino](https://img.shields.io/badge/c%2B%2B-Arduino%20-red.svg)](https://github.com/adafruit/Adafruit_CircuitPlayground)
+[![Platformio Version](https://img.shields.io/badge/platformio-3.6.2-orange.svg)](https://platformio.org/)
+[![Platform](https://img.shields.io/badge/platform-ESP8266-yellow.svg)](https://platformio.org/platforms/espressif8266)
 
-You now need to clone the project (if it's not already there).
+This is a C++ project developed using Platformio framework for the Espresiff's ESP8266 hardware. The other hardware required is a [Seeedstudio PIR Sensor](http://wiki.seeedstudio.com/Grove-PIR_Motion_Sensor/).
 
-```bash
-git clone https://github.com/Melkoroth/AIDEdevelopmentHardware.git
-cd AIDEdevelopmentHardware/phatHardwareLink/target/
-java -jar PhatHardwareLink-1.0.0-SNAPSHOT.jar
-```
-Be warned that **first time compiling takes 1+ hours**
+### Pinout
+| ESP8266       | PIR          |
+| ------------- |-------------:|
+| 3.3V          | VCC          |
+| GND           | GND          |
+| D1            | D1           |
 
+Internally the hardware keeps polling the PIR sensor every 3 seconds and if a movement is detected the MQTT message *alarm* is sent through the *presence* topic, initiating the chain of events.
 
-## **---DEPRECATED---**
+This is a wifi-enabled device so you should check ssid & password settings in the .ino.
 
-## Using the MQTT broker
-MQTT needs a server installed to be used as a MQTT broker. You can use Ubuntu's included one, mosquitto, or an external provider just by changing IP address and port inside the code.
+## Using a MQTT broker
+
+The experiments are designed to run from the JAVA classes, which automatically start an internal broker. If you want to test with an external one you can do so with Ubuntu's included one, mosquitto.
 
 ### Installation and usage
 ```bash
@@ -106,10 +109,6 @@ You can use mosquitto_pub to send a message to any topic:
 ```bash
 mosquitto_pub -h localhost -t "anyTopic" -m "message"
 ```
-## Topics used
-*  Hardware subscribes to *alertTopic*
-*  Software subscribes to *alertButtonTopic*
-
 ## Hardware libraries are included as git submodules
 ```bash
 git submodule init
@@ -161,9 +160,6 @@ cd basePhatSim
 mvn clean compile
 ant runSimPresence
 ```
-
-## espHardware
-By default ESP publishes every 5 seconds to *pubESP* and any message sent to *subESP* is written to serial.
 
 ## Why ESP8266?
 A Wemos D1 Mini Pro is being used for the rapid prototyping of AAL solutions. The board is based in the ESP8266 chip with 16MB of on-board flash memory.
