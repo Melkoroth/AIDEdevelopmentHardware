@@ -10,14 +10,7 @@ The proposed solution is simple but effective. It is a **Caregiver Warning Syste
 
 As it is a derived project which uses [PHATSIM](https://github.com/Grasia/phatsim) we can test the developed hardware in the simulator before implementing it in real-life.
 
-## Hardware libraries are included as git submodules
-```bash
-git submodule init
-git submodule update
-```
-
-## JAVA, Maven and ANT install
-Please refer to the "Getting Started" section of [AIDEdevelopment's README](https://github.com/Melkoroth/AIDEdevelopment/blob/master/README.md)
+![Hardware Demo](https://github.com/Grasia/AIDEdevelopmentHardware/raw/master/resources/presenceHardware.gif)
 
 ## Projected Experiments
 1. Usage with PHATSIM's **virtual** motion detector.
@@ -35,7 +28,17 @@ CircuitPlayground Express should be connected to the PC's serial port.
 
 Both PC JAVA program mains set up the MQTT Broker. 
 
-## phatHardwareLink
+### Hardware libraries are included as git submodules
+```bash
+git submodule init
+git submodule update
+```
+
+### JAVA, Maven and ANT install
+Please refer to the "Getting Started" section of [AIDEdevelopment's README](https://github.com/Melkoroth/AIDEdevelopment/blob/master/README.md)
+
+## Software projects list
+### phatHardwareLink
 [![OpenJDK Version](https://img.shields.io/badge/openjdk-v1.8-red.svg)](http://openjdk.java.net/)
 [![Maven Version](https://img.shields.io/badge/maven-v3.1.1-orange.svg)](http://maven.apache.org/)
 
@@ -49,7 +52,7 @@ The important methods this class has are these:
 * initWarnSequence() is called when movement in the room is detected in PHATSim.
 * For the ESP8266's hardware sensor sending a MQTT message on topic "presence" with the message "alarm" has the same effects as calling initWarnSequence.
 
-## circuitPlaygroundHardware
+### circuitPlaygroundHardware
 [![C++ Arduino](https://img.shields.io/badge/c%2B%2B-Arduino%20-red.svg)](https://github.com/adafruit/Adafruit_CircuitPlayground)
 [![Platformio Version](https://img.shields.io/badge/platformio-3.6.2-orange.svg)](https://platformio.org/)
 [![Platform](https://img.shields.io/badge/platform-Atmel%20SAM-yellow.svg)](https://platformio.org/platforms/atmelsam)
@@ -59,7 +62,7 @@ This is a C++ project developed using Platformio framework for the Adafruit Hard
 Internally the hardware keeps waiting for the serial character 'a' which means that the alarm has been triggered.
 When the alarm is triggered it will flash lights, speak out loud and wait for the caregiver to acknowledge the warning with the press of any button. Once the user has acknowledged the message a 'b' is returned through serial.
 
-## espHardwareReceiver
+### espHardwareReceiver
 [![C++ Arduino](https://img.shields.io/badge/c%2B%2B-Arduino%20-red.svg)](https://github.com/adafruit/Adafruit_CircuitPlayground)
 [![Platformio Version](https://img.shields.io/badge/platformio-3.6.2-orange.svg)](https://platformio.org/)
 [![Platform](https://img.shields.io/badge/platform-ESP8266-yellow.svg)](https://platformio.org/platforms/espressif8266)
@@ -78,7 +81,7 @@ Internally the hardware keeps waiting for the MQTT message *Warning!* sent throu
 
 This is a wifi-enabled device so you should check ssid & password settings in the .ino.
 
-## espHardwarePresence
+### espHardwarePresence
 [![C++ Arduino](https://img.shields.io/badge/c%2B%2B-Arduino%20-red.svg)](https://github.com/adafruit/Adafruit_CircuitPlayground)
 [![Platformio Version](https://img.shields.io/badge/platformio-3.6.2-orange.svg)](https://platformio.org/)
 [![Platform](https://img.shields.io/badge/platform-ESP8266-yellow.svg)](https://platformio.org/platforms/espressif8266)
