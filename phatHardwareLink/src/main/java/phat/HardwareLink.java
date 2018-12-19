@@ -8,10 +8,7 @@ import io.moquette.BrokerConstants;
 import io.moquette.server.Server;
 import static io.moquette.BrokerConstants.PERSISTENT_STORE_PROPERTY_NAME;
 
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import com.fazecast.jSerialComm.*;
 
@@ -20,7 +17,7 @@ import com.fazecast.jSerialComm.*;
  * Server as the intermediator between the presence sensors and the caregiver's hardware
  * @author melkoroth
  */
-public class HardwareLink implements Runnable {
+public class HardwareLink implements Runnable, MqttCallback {
 
     //MQTT variables
     //private Server mqttBroker = new Server();
@@ -32,7 +29,8 @@ public class HardwareLink implements Runnable {
     private final String mqttTopic = "presence";
     private final String mqttMessage = "Warning!";
     private final MemoryPersistence mqttPersistence = new MemoryPersistence();
-    private MqttClient mqttClient;
+    //private MqttClient mqttClient;
+    private MqttAsyncClient mqttClient;
     private MqttConnectOptions connOpts;
 
     //Serial variables
@@ -94,9 +92,15 @@ public class HardwareLink implements Runnable {
 
         //Start MQTT client
         try {
-            mqttClient = new MqttClient(mqttBrokerURL, mqttClientId, mqttPersistence);
+            //mqttClient = new MqttClient(mqttBrokerURL, mqttClientId, mqttPersistence);
             connOpts = new MqttConnectOptions();
             connOpts.setCleanSession(true);
+            mqttClient = new MqttAsyncClient(mqttBrokerURL, mqttClientId);
+            mqttClient.setCallback(this);
+            IMqttToken conToken = mqttClient.connect(connOpts,null, null);
+            conToken.waitForCompletion();
+            IMqttToken subToken = mqttClient.subscribe(mqttTopic, mqttQos, null, null);
+            subToken.waitForCompletion();
 
         } catch(MqttException me) {
             handleMQTTexception(me);
@@ -107,31 +111,31 @@ public class HardwareLink implements Runnable {
         for (int i = 0; i < ports.length; i++) {
             if (ports[i].toString().equalsIgnoreCase(cpName)) {
                 circuitPlayground = SerialPort.getCommPort("/dev/" + ports[i].getSystemPortName());
+                circuitPlayground.setBaudRate(serialBauds);
+                serialOpened = circuitPlayground.openPort();
+                //Attach listener for incoming serial data
+                circuitPlayground.addDataListener(new SerialPortDataListener() {
+                    @Override
+                    public int getListeningEvents() { return SerialPort.LISTENING_EVENT_DATA_AVAILABLE; }
+                    @Override
+                    public void serialEvent(SerialPortEvent event)
+                    {
+                        if (event.getEventType() != SerialPort.LISTENING_EVENT_DATA_AVAILABLE)
+                            return;
+                        byte[] newData = new byte[circuitPlayground.bytesAvailable()];
+                        int numRead = circuitPlayground.readBytes(newData, newData.length);
+                        //System.out.println("Read " + numRead + " bytes.");
+                        //System.out.println("Message: " + new String(newData));
+                        if (new String(newData).equalsIgnoreCase(buttonPressedMessage)) {
+                            //alarmDeactivated = true;
+                            if (actState.equals(States.WButton)) {
+                                actState = States.Waiting;
+                            }
+                        }
+                    }
+                });
             }
         }
-        circuitPlayground.setBaudRate(serialBauds);
-        serialOpened = circuitPlayground.openPort();
-        //Attach listener for incoming serial data
-        circuitPlayground.addDataListener(new SerialPortDataListener() {
-            @Override
-            public int getListeningEvents() { return SerialPort.LISTENING_EVENT_DATA_AVAILABLE; }
-            @Override
-            public void serialEvent(SerialPortEvent event)
-            {
-                if (event.getEventType() != SerialPort.LISTENING_EVENT_DATA_AVAILABLE)
-                    return;
-                byte[] newData = new byte[circuitPlayground.bytesAvailable()];
-                int numRead = circuitPlayground.readBytes(newData, newData.length);
-                //System.out.println("Read " + numRead + " bytes.");
-                //System.out.println("Message: " + new String(newData));
-                if (new String(newData).equalsIgnoreCase(buttonPressedMessage)) {
-                    //alarmDeactivated = true;
-                    if (actState.equals(States.WButton)) {
-                        actState = States.Waiting;
-                    }
-                }
-            }
-        });
 
         //Start thread to check HW statuses
         Thread t = new Thread(this);
@@ -155,7 +159,7 @@ public class HardwareLink implements Runnable {
     private void sendMQTTmessage(String msg) {
         try {
             //System.out.println("Connecting to broker: "+mqttBroker);
-            mqttClient.connect(connOpts);
+            //mqttClient.connect(connOpts);
             //System.out.println("Connected");
             //System.out.println("Publishing message: "+msg);
             MqttMessage message = new MqttMessage(msg.getBytes(StandardCharsets.UTF_8));
@@ -176,5 +180,26 @@ public class HardwareLink implements Runnable {
         System.out.println("cause "+me.getCause());
         System.out.println("excep "+me);
         me.printStackTrace();
+    }
+
+    @Override
+    public void connectionLost(Throwable cause) {
+        System.out.println("connection lost");
+    }
+
+    @Override
+    public void messageArrived(String topic, MqttMessage message) throws Exception {
+        if ((topic.equals(mqttTopic)) && (message.toString().equals("alarm"))) {
+            this.initWarnSequence();
+            System.out.println("detected");
+        }
+        //System.out.println("Got message");
+        //System.out.println(topic);
+        //System.out.println(message.toString());
+    }
+
+    @Override
+    public void deliveryComplete(IMqttDeliveryToken token) {
+        System.out.println("delivery complete");
     }
 }

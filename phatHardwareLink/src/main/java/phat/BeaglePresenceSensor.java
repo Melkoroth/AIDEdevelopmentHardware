@@ -13,23 +13,25 @@ import io.silverspoon.bulldog.core.util.BulldogUtil;
 public class BeaglePresenceSensor {
     static HardwareLink hwLink = new HardwareLink();
 
-    private static String LED3_PATH = "/sys/class/leds/beaglebone:green:usr3";
+    //private static String LED3_PATH = "/sys/class/leds/beaglebone:green:usr3";
 
     public static void main(String[] args) throws IOException {
-        Board board = Platform.createBoard();
+        //Board board = Platform.createBoard();
 
-        DigitalOutput led = (DigitalOutput) board.getPinByAlias("P8_8");
+        //DigitalOutput led = (DigitalOutput) board.getPinByAlias("P8_8");
 
         //Start link to hardware
         hwLink.startHardwareLink();
+
+        //hwLink.initWarnSequence();
 
         /*writeLED("/trigger", "timer", LED3_PATH);
         writeLED("/delay_on", "50", LED3_PATH);
         writeLED("/delay_off", "50", LED3_PATH);*/
 
-        hwLink.initWarnSequence();
+        //hwLink.initWarnSequence();
 
-        led.high();
+        /*led.high();
         BulldogUtil.sleepMs(1000);
         led.low();
         BulldogUtil.sleepMs(1000);
@@ -37,7 +39,7 @@ public class BeaglePresenceSensor {
         BulldogUtil.sleepMs(1000);
         led.low();
         BulldogUtil.sleepMs(1000);
-        led.high();
+        led.high();*/
 
         /*System.out.println("Starting the LED Java Application");
         if(args.length!=1) {
@@ -76,7 +78,7 @@ public class BeaglePresenceSensor {
 
     }
 
-    private static void writeLED(String filename, String value, String path){
+    /*private static void writeLED(String filename, String value, String path){
         try{
             BufferedWriter bw = new BufferedWriter(new FileWriter (path+filename));
             bw.write(value);
@@ -85,9 +87,9 @@ public class BeaglePresenceSensor {
         catch(IOException e){
             System.err.println("Failed to access the BBB Sysfs file: " + filename);
         }
-    }
+    }*/
 
-    private static void removeTrigger(){
-        writeLED("/trigger", "none", LED3_PATH);
-    }
+    //private static void removeTrigger(){
+        //writeLED("/trigger", "none", LED3_PATH);
+    //}
 }

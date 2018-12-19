@@ -73,11 +73,12 @@ connmanctl> quit
 ifconfig -a
 ```
 
-You now need to clone the project (if it's not already there), compile and run it:
+You now need to clone the project (if it's not already there).
 
 ```bash
-cd AIDEdevelopmentHardware/phatHardwareLink/
-mvn compile
+git clone https://github.com/Melkoroth/AIDEdevelopmentHardware.git
+cd AIDEdevelopmentHardware/phatHardwareLink/target/
+java -jar PhatHardwareLink-1.0.0-SNAPSHOT.jar
 ```
 Be warned that **first time compiling takes 1+ hours**
 

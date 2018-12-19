@@ -279,7 +279,9 @@ void mqttCallback(char* topic, uint8_t* payload, unsigned int length) {
     Sprintln();
 
     //displayMQTTmessage(topic, msg);
-    triggerWarning(msg);
+    if (strcmp(msg, "Warning!") == 0) {
+        triggerWarning(msg);
+    }
 }
 
 //Checks if MQTT is connected and reconnects if needed
